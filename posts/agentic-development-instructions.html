@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic Development in Business Central: Using Instructions to Guide Your Coding Agent</title>
+<meta name="description" content="How to use instruction files to guide GitHub Copilot's agent mode when generating AL code in Business Central.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="titlebar">
+  <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+  <span class="path">learning-business-central — posts/agentic-development-instructions.html</span>
+</div>
+
+<div class="tabbar">
+  <div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+  <div class="tab active"><span>agentic-development</span><span class="ext">.html</span></div>
+</div>
+
+<main>
+  <div class="eyebrow">posts / agentic-development</div>
+  <h1>Agentic Development in Business Central: Using Instructions to Guide Your Coding Agent</h1>
+  <div class="meta">
+    <span>Roberto Corella</span>
+    <span>July 24, 2026</span>
+    <span>AL · Agentic Development · GitHub Copilot</span>
+  </div>
+
+  <p>When we talk about agents in Business Central, we almost always think of end-user features: a copilot that helps issue an invoice, analyze sales, or answer a question inside the app. But there's another use, less visible and just as powerful: applying agents to the development process itself — using them to write AL code, create tables, pages, and the rest of the objects that make up an extension.</p>
+
+  <p>This article opens a series on agentic development in Business Central, starting with its most basic building block: instructions.</p>
+
+  <figure>
+    <img src="../assets/images/agenticDevelopment.png" alt="GitHub Copilot agent mode in Visual Studio Code, generating AL objects for Business Central">
+  </figure>
+
+  <h2>What is agentic development</h2>
+  <p>Agentic development means working with a coding agent — in this case, GitHub Copilot in agent mode inside Visual Studio Code — that doesn't just autocomplete lines, but carries out complete tasks: it creates tables and pages, reads <code>app.json</code> to understand the project's context, and proposes changes that the developer can accept or discard.</p>
+  <p>The goal isn't to replace the development team, but to increase its productivity, delegating repetitive or structural work so the team can focus on design and business logic.</p>
+
+  <h2>The problem with starting from zero</h2>
+  <p>Asking an agent for something as simple as "create a table and a page called Logging with the following fields: ID, Description, Time, Date" works, but the result reflects exactly what was typed in the prompt: field names appear as-is, with no naming conventions, no company prefix, and sometimes no consistent choice of language.</p>
+  <p>It's a decent starting point, but not the result most teams need to keep code consistent across developers.</p>
+
+  <h2>Instructions: the first building block of agentic development</h2>
+  <p>To fix this, GitHub Copilot lets you define persistent instructions that the agent automatically reads whenever it works on a given file type. In an AL project, this is organized as follows:</p>
+  <ul>
+    <li>A <code>.github</code> folder is created at the root of the project.</li>
+    <li>An instructions file is added inside it.</li>
+    <li>The file includes an <code>applyTo</code> header specifying which file types the rules apply to (for example, every file with the <code>.al</code> extension).</li>
+  </ul>
+  <p>From that point on, any instruction you define becomes a rule the agent follows automatically, without the developer having to repeat it in every prompt.</p>
+
+  <figure>
+    <img src="../assets/images/instructions.png" alt="Example of an instructions file with an applyTo header targeting .al files">
+  </figure>
+
+  <h2>What kind of rules are worth defining</h2>
+  <p>For AL, some of the most useful instructions are:</p>
+  <ul>
+    <li><strong>Naming convention</strong>: PascalCase for objects and fields, for example.</li>
+    <li><strong>Extension prefix</strong>: most companies work with an identifying prefix that must appear in every object's name.</li>
+    <li><strong>Naming pattern</strong>: object name + object type + prefix, with a character limit (30, for example) to avoid excessively long names.</li>
+    <li><strong>No abbreviations</strong>, unless they're widely recognizable, to keep the code readable.</li>
+    <li><strong>Language for variables and fields</strong>: if the team works in English, it's worth stating it explicitly. The agent may remember a preference from an earlier session, but that doesn't guarantee it will apply it consistently every time — only an explicit instruction turns it into a mandatory rule.</li>
+  </ul>
+  <p>Repeating the exact same initial prompt (create the Login table and page) once these instructions are in place changes the outcome completely: the agent respects the prefix, applies PascalCase, follows the defined naming pattern, and uses English field names — because now it's part of a rule, not a one-off preference.</p>
+
+  <figure>
+    <img src="../assets/images/sample.png" alt="Result generated by the agent once naming and language instructions are applied">
+  </figure>
+
+  <h2>Why this matters</h2>
+  <p>Instructions aren't a decorative feature: they're how you make sure a coding agent behaves according to the team's standards instead of improvising on every interaction. The clearer the instruction, the less room the agent has to make its own calls — like picking a field's language without ever being asked to.</p>
+  <p>This is just the first piece of agentic development applied to Business Central. Future entries will add more pieces: other tools, additional configuration, and examples that take this workflow beyond the basics.</p>
+  <p>If your team is already experimenting with coding agents on AL projects, defining a solid instructions file is the step with the best return for the least effort.</p>
+
+  <div class="callout">Watch the full walkthrough — the video below (in Spanish) shows this exact example live in Visual Studio Code, from the first ungoverned prompt to the fully-instructed result.</div>
+
+  <h2>Video walkthrough</h2>
+  <div class="video-embed">
+    <iframe src="https://www.youtube-nocookie.com/embed/-p0K9LQIH-c" title="Agentic Development in Business Central — Instructions" allow="accelerate; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+  </div>
+</main>
+
+<div class="statusbar">
+  <span>main</span>
+  <span><a href="../index.html">← back to index</a></span>
+</div>
+
+</body>
+</html>

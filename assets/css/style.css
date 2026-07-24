@@ -1,0 +1,233 @@
+/* ==========================================================================
+   Learning Business Central — shared stylesheet
+   Design language: VS Code "Dark+" editor chrome, since the content is
+   about agentic AL development inside VS Code / GitHub Copilot.
+   ========================================================================== */
+
+:root {
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #252526;
+  --bg-tertiary: #2d2d30;
+  --border: #3c3c3c;
+  --text-primary: #d4d4d4;
+  --text-secondary: #9aa0a6;
+  --accent-blue: #569cd6;
+  --accent-yellow: #dcdcaa;
+  --accent-orange: #ce9178;
+  --accent-green: #6a9955;
+
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --radius: 6px;
+  --max-width: 760px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent-blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
+
+img { max-width: 100%; border-radius: var(--radius); display: block; }
+
+/* ---------- "Editor window" chrome used on every page ---------- */
+
+.titlebar {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.titlebar .dot { width: 11px; height: 11px; border-radius: 50%; }
+.dot.red { background: #ff5f56; }
+.dot.yellow { background: #ffbd2e; }
+.dot.green { background: #27c93f; }
+
+.titlebar .path {
+  margin-left: 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.tabbar {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  overflow-x: auto;
+}
+
+.tab {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 10px 18px;
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab .ext { color: var(--accent-orange); }
+.tab.active {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border-top: 2px solid var(--accent-blue);
+}
+.tab a { color: inherit; }
+.tab a:hover { text-decoration: none; color: var(--text-primary); }
+
+/* ---------- Layout ---------- */
+
+main {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent-green);
+  margin-bottom: 12px;
+}
+.eyebrow::before { content: "// "; color: var(--text-secondary); }
+
+h1 {
+  font-family: var(--font-mono);
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  line-height: 1.3;
+  color: #fff;
+  margin: 0 0 16px;
+}
+
+h2 {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  color: var(--accent-blue);
+  margin: 40px 0 16px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+p { color: var(--text-primary); }
+p + p { margin-top: 1em; }
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+.meta span::after { content: "  •  "; color: var(--border); }
+.meta span:last-child::after { content: ""; }
+
+code {
+  font-family: var(--font-mono);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.9em;
+  color: var(--accent-orange);
+}
+
+pre {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+pre code { border: none; background: none; padding: 0; color: var(--text-primary); }
+
+ul, ol { padding-left: 22px; }
+li { margin-bottom: 8px; }
+li strong { color: var(--accent-yellow); }
+
+figure { margin: 32px 0; }
+figcaption {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  text-align: center;
+}
+
+.video-embed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin: 16px 0;
+}
+.video-embed iframe {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
+}
+
+.callout {
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 16px 20px;
+  margin: 24px 0;
+  color: var(--text-primary);
+  font-size: 0.95em;
+}
+
+/* ---------- Post index (home) ---------- */
+
+.post-list { list-style: none; padding: 0; margin: 24px 0; }
+.post-card {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.post-card:hover { border-color: var(--accent-blue); text-decoration: none; transform: translateX(2px); }
+.post-card .post-title { color: #fff; font-family: var(--font-mono); font-size: 1.05rem; margin: 0 0 8px; }
+.post-card .post-excerpt { color: var(--text-secondary); font-size: 0.95em; margin: 0; }
+
+/* ---------- Footer / status bar ---------- */
+
+.statusbar {
+  background: var(--accent-blue);
+  color: #1e1e1e;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 20px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.statusbar a { color: #1e1e1e; font-weight: 600; }
+
+@media (max-width: 600px) {
+  main { padding: 32px 16px 64px; }
+  .statusbar { justify-content: center; text-align: center; }
+}
