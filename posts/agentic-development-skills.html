@@ -27,7 +27,7 @@
 <span>July 29, 2026</span>
 <span>AL · Agentic Development · GitHub Copilot</span>
 </div>
-<p>Anyone who has built AL extensions has run into this before: an error message that simply says "Error in the document" and tells you nothing. Not the message, not the technical detail behind it — nothing that helps you understand what happened, why it happened, or what to do about it. It's a common enough problem to make a perfect case study for one of the most useful building blocks in agentic development with GitHub Copilot: <strong>skills</strong>.</p>
+<p>Anyone who has built AL extensions has run into this before: an error message that simply says "Error in the document" and tells you nothing. Not the message, not the technical detail behind it, nothing that helps you understand what happened, why it happened, or what to do about it. It's a common enough problem to make a perfect case study for one of the most useful building blocks in agentic development with GitHub Copilot: <strong>skills</strong>.</p>
 
 <p>This is the second entry in the series on agentic development in Business Central. The <a href="agentic-development-instructions.html">first article</a> covered instructions; this one moves on to skills, and to the difference between something the agent must always follow and something it only applies when asked.</p>
 
@@ -36,7 +36,7 @@
 </figure>
 
 <h2>Instructions vs. skills</h2>
-<p>Instructions, as covered in the previous article, are mandatory: an <code>applyTo</code> header ties them to a file type — <code>.al</code> files, for example — and from then on every piece of code the agent generates in that scope has to respect them.</p>
+<p>Instructions, as covered in the previous article, are mandatory: an <code>applyTo</code> header ties them to a file type — <code>.al</code> files, for example, and from then on every piece of code the agent generates in that scope has to respect them.</p>
 <p>Skills work differently. They live inside a <code>skills</code> folder, nested under <code>.github</code>, and each one is made up of three parts: a name, a description, and a detailed explanation of how to do something. The key difference is that <strong>a skill is never triggered automatically</strong>. There's no <code>applyTo</code> attaching it to a file type. The agent only uses it when it's explicitly told to — or when it's invoked from another part of the workflow, something we'll get into in a future entry.</p>
 <p>That makes skills the right tool for capturing a specific practice — like "this is what a good error message looks like in this extension" — without forcing it into every single line of code the agent writes.</p>
 
@@ -47,9 +47,9 @@
 <li>Why did it happen?</li>
 <li>What should be done about it?</li>
 </ol>
-<p>In AL, the skill points the agent to <code>ErrorInfo</code>, the data type that lets an error carry a title, a detailed message, and even an action — for instance, a codeunit that can be run to fix the problem directly from the error message itself. When <code>ErrorInfo</code> isn't an option because not all the parameters are available, the skill still requires the plain error text to cover the same three answers, with a concrete example: <em>"The ending date [X] is earlier than the starting date [Y]. Correct the ending date before continuing."</em></p>
+<p>In AL, the skill points the agent to <code>ErrorInfo</code>, the data type that lets an error carry a title, a detailed message, and even an action, for instance, a codeunit that can be run to fix the problem directly from the error message itself. When <code>ErrorInfo</code> isn't an option because not all the parameters are available, the skill still requires the plain error text to cover the same three answers, with a concrete example: <em>"The ending date [X] is earlier than the starting date [Y]. Correct the ending date before continuing."</em></p>
 <p>The skill is equally explicit about what to avoid: generic messages ("Error in the document", "Could not be processed", "Invalid value"), references to a technical field name, or bare error codes ("Error 17"). None of these give the person hitting the error anything useful to act on.</p>
-<p>Finally, it sets a couple of coding-style rules: every error text must live in a <code>Label</code> variable — never hardcoded — and those labels must end with the <code>Err</code> suffix, so they're easy to spot and maintain.</p>
+<p>Finally, it sets a couple of codingstyle rules: every error text must live in a <code>Label</code> variable — never hardcoded — and those labels must end with the <code>Err</code> suffix, so they're easy to spot and maintain.</p>
 
 <figure>
 <img src="../assets/images/skill-error-message.png" alt="Skill definition file describing the ErrorInfo rule and the three questions an error message must answer">
