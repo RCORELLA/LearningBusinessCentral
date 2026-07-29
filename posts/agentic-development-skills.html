@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic Development in Business Central: Using Skills to Teach Your Coding Agent</title>
+<meta name="description" content="How to use skills to capture reusable know-how for GitHub Copilot's agent mode, with a practical example: turning generic AL errors into informative ErrorInfo messages.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div class="titlebar">
+<span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+<span class="path">learning-business-central — posts/agentic-development-skills.html</span>
+</div>
+<div class="tabbar">
+<div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+<div class="tab"><a href="agentic-development-instructions.html"><span>agentic-development-instructions</span><span class="ext">.html</span></a></div>
+<div class="tab active"><span>agentic-development-skills</span><span class="ext">.html</span></div>
+</div>
+<main>
+<div class="eyebrow">posts / agentic-development</div>
+<h1>Agentic Development in Business Central: Using Skills to Teach Your Coding Agent</h1>
+<div class="meta">
+<span>Roberto Corella</span>
+<span>July 29, 2026</span>
+<span>AL · Agentic Development · GitHub Copilot</span>
+</div>
+<p>Anyone who has built AL extensions has run into this before: an error message that simply says "Error in the document" and tells you nothing. Not the message, not the technical detail behind it — nothing that helps you understand what happened, why it happened, or what to do about it. It's a common enough problem to make a perfect case study for one of the most useful building blocks in agentic development with GitHub Copilot: <strong>skills</strong>.</p>
+
+<p>This is the second entry in the series on agentic development in Business Central. The <a href="agentic-development-instructions.html">first article</a> covered instructions; this one moves on to skills, and to the difference between something the agent must always follow and something it only applies when asked.</p>
+
+<figure>
+<img src="../assets/images/skills-overview.png" alt="Skills folder structure inside .github, next to the instructions folder, in Visual Studio Code">
+</figure>
+
+<h2>Instructions vs. skills</h2>
+<p>Instructions, as covered in the previous article, are mandatory: an <code>applyTo</code> header ties them to a file type — <code>.al</code> files, for example — and from then on every piece of code the agent generates in that scope has to respect them.</p>
+<p>Skills work differently. They live inside a <code>skills</code> folder, nested under <code>.github</code>, and each one is made up of three parts: a name, a description, and a detailed explanation of how to do something. The key difference is that <strong>a skill is never triggered automatically</strong>. There's no <code>applyTo</code> attaching it to a file type. The agent only uses it when it's explicitly told to — or when it's invoked from another part of the workflow, something we'll get into in a future entry.</p>
+<p>That makes skills the right tool for capturing a specific practice — like "this is what a good error message looks like in this extension" — without forcing it into every single line of code the agent writes.</p>
+
+<h2>A practical case: informative error messages</h2>
+<p>To illustrate how a skill works, we define one focused on improving error messages. The rule is simple: every error message must answer three questions, in this order:</p>
+<ol>
+<li>What happened?</li>
+<li>Why did it happen?</li>
+<li>What should be done about it?</li>
+</ol>
+<p>In AL, the skill points the agent to <code>ErrorInfo</code>, the data type that lets an error carry a title, a detailed message, and even an action — for instance, a codeunit that can be run to fix the problem directly from the error message itself. When <code>ErrorInfo</code> isn't an option because not all the parameters are available, the skill still requires the plain error text to cover the same three answers, with a concrete example: <em>"The ending date [X] is earlier than the starting date [Y]. Correct the ending date before continuing."</em></p>
+<p>The skill is equally explicit about what to avoid: generic messages ("Error in the document", "Could not be processed", "Invalid value"), references to a technical field name, or bare error codes ("Error 17"). None of these give the person hitting the error anything useful to act on.</p>
+<p>Finally, it sets a couple of coding-style rules: every error text must live in a <code>Label</code> variable — never hardcoded — and those labels must end with the <code>Err</code> suffix, so they're easy to spot and maintain.</p>
+
+<figure>
+<img src="../assets/images/skills-errorinfo-rule.png" alt="Skill definition file describing the ErrorInfo rule and the three questions an error message must answer">
+</figure>
+
+<h2>Why skills need to be called explicitly</h2>
+<p>The first test makes the behavior of skills obvious. Starting from a codeunit full of the usual unhelpful errors ("Error", "Error in the document", "Line cannot be processed", "Invalid value"), the agent is simply asked to improve the errors in that codeunit — nothing more.</p>
+<p>The result is a slightly nicer wording, but it completely ignores the rules that were defined: no <code>ErrorInfo</code>, no <code>Label</code> variables, no <code>Err</code> suffix. The reason is straightforward — the skill was never invoked. Unlike an instruction, which applies automatically to any AL file, a skill only comes into play when the agent is told to go and read it.</p>
+<p>The fix is to name it explicitly in the prompt: <em>"Improve the errors in this codeunit using the ErrorMessages skill."</em> At that point the behavior changes completely. The agent locates the skill file, reads its content, and only then applies the rules: it generates the <code>Label</code> variables with the <code>Err</code> suffix, builds the corresponding <code>ErrorInfo</code> wherever possible, and produces messages that answer the three questions — what happened, why it happened, and what to do about it.</p>
+
+<figure>
+<img src="../assets/images/skills-invoked-result.png" alt="AL codeunit after the agent applies the ErrorMessages skill, showing ErrorInfo variables and Err-suffixed labels">
+</figure>
+
+<h2>Seeing it at runtime</h2>
+<p>Testing it live makes the difference obvious. An inconsistent date range that used to produce a blank "Error in the document" now returns something like: <em>"The ending date is earlier than the starting date of the rental period. Correct the ending date before continuing."</em> The same happens when simulating a credit limit being exceeded: the message explains the problem and points straight at the fix.</p>
+
+<h2>The takeaway</h2>
+<p>The lesson goes beyond error messages. Whenever the agent solves a task in a way that doesn't match how you want things built, the answer isn't to keep fixing it by hand every time — it's to <strong>turn that practice into a skill</strong>. The time spent documenting a good practice once pays for itself many times over, because the agent stops repeating the same approach mistake in every future iteration.</p>
+<p>Instructions guarantee a baseline that every piece of code has to meet. Skills let you teach the agent specific procedures, on demand, without loading every single generation with rules that don't always apply. Knowing when to use each one is one of the keys to making agentic development genuinely productive in Business Central.</p>
+<p>The next entry in this series will keep building on this: more pieces of the workflow, and how instructions and skills combine with the rest of what GitHub Copilot's agent mode can do.</p>
+
+<div class="callout">Watch the full walkthrough — the video below (in Spanish) shows this exact example live in Visual Studio Code, from the ungoverned first attempt to the skill-driven result.</div>
+
+<h2>Video walkthrough</h2>
+<div class="video-embed">
+<iframe src="https://www.youtube-nocookie.com/embed/VIDEO_ID_HERE" title="Agentic Development in Business Central — Skills" allow="accelerate; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+</div>
+
+</main>
+<div class="statusbar">
+<span>main</span>
+<span><a href="../index.html">← back to index</a></span>
+</div>
+</body>
+</html>
