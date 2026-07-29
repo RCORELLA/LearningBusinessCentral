@@ -32,7 +32,7 @@
 <p>This is the second entry in the series on agentic development in Business Central. The <a href="agentic-development-instructions.html">first article</a> covered instructions; this one moves on to skills, and to the difference between something the agent must always follow and something it only applies when asked.</p>
 
 <figure>
-<img src="../assets/images/skills-overview.png" alt="Skills folder structure inside .github, next to the instructions folder, in Visual Studio Code">
+<img src="../assets/images/skill-Global-image.png" alt="Skills folder structure inside .github, next to the instructions folder, in Visual Studio Code">
 </figure>
 
 <h2>Instructions vs. skills</h2>
@@ -52,7 +52,7 @@
 <p>Finally, it sets a couple of coding-style rules: every error text must live in a <code>Label</code> variable — never hardcoded — and those labels must end with the <code>Err</code> suffix, so they're easy to spot and maintain.</p>
 
 <figure>
-<img src="../assets/images/skills-errorinfo-rule.png" alt="Skill definition file describing the ErrorInfo rule and the three questions an error message must answer">
+<img src="../assets/images/skill-error-message.png" alt="Skill definition file describing the ErrorInfo rule and the three questions an error message must answer">
 </figure>
 
 <h2>Why skills need to be called explicitly</h2>
@@ -61,7 +61,7 @@
 <p>The fix is to name it explicitly in the prompt: <em>"Improve the errors in this codeunit using the ErrorMessages skill."</em> At that point the behavior changes completely. The agent locates the skill file, reads its content, and only then applies the rules: it generates the <code>Label</code> variables with the <code>Err</code> suffix, builds the corresponding <code>ErrorInfo</code> wherever possible, and produces messages that answer the three questions — what happened, why it happened, and what to do about it.</p>
 
 <figure>
-<img src="../assets/images/skills-invoked-result.png" alt="AL codeunit after the agent applies the ErrorMessages skill, showing ErrorInfo variables and Err-suffixed labels">
+<img src="../assets/images/skills-directory.jpg" alt="AL codeunit after the agent applies the ErrorMessages skill, showing ErrorInfo variables and Err-suffixed labels">
 </figure>
 
 <h2>Seeing it at runtime</h2>
@@ -76,7 +76,7 @@
 
 <h2>Video walkthrough</h2>
 <div class="video-embed">
-<iframe src="https://www.youtube-nocookie.com/embed/VIDEO_ID_HERE" title="Agentic Development in Business Central — Skills" allow="accelerate; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+<iframe src="https://www.youtube-nocookie.com/embed/e8n4x47-zfA" title="Agentic Development in Business Central — Skills" allow="accelerate; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
 </div>
 
 </main>
