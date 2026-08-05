@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic Development in Business Central: Turning Skills into Executable Prompts</title>
+<meta name="description" content="How to use prompt-workflow files to turn instructions and skills into a controlled, step-by-step AL development task with a human review checkpoint.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="titlebar">
+  <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+  <span class="path">learning-business-central — posts/agentic-development-prompts.html</span>
+</div>
+
+<div class="tabbar">
+  <div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+  <div class="tab active"><span>agentic-development</span><span class="ext">.html</span></div>
+</div>
+
+<main>
+  <div class="eyebrow">posts / agentic-development</div>
+  <h1>Agentic Development in Business Central: Turning Skills into Executable Prompts</h1>
+  <div class="meta">
+    <span>Roberto Corella</span>
+    <span>August 5, 2026</span>
+    <span>AL · Agentic Development · GitHub Copilot</span>
+  </div>
+
+  <p>When you automate development with an AI agent, the biggest risk isn't that the model gets something wrong once — it's that it repeats the same mistake a hundred times because nobody gave it a fixed recipe to follow. Instructions set the rules that are always active, and skills provide domain-specific knowledge, but there's a third piece missing: something that turns that knowledge into a concrete, executable task with a beginning and an end. That piece is the <strong>prompt</strong>.</p>
+
+  <p>This article continues the series on agentic development in Business Central, moving from instructions and skills to the piece that ties them together into a controlled workflow.</p>
+
+  <figure>
+    <img src="../assets/images/promptsOverview.png" alt="GitHub Copilot agent mode executing a prompt-workflow for AL development">
+  </figure>
+
+  <h2>What a prompt is (and isn't)</h2>
+  <p>A prompt doesn't think — it executes a recipe, step by step. That's the difference between telling an agent "be careful with the data" (an instruction, always active) and giving it a numbered list of what to do first, what to do next, and when to stop and ask (a prompt). Prompts exist specifically to automate repetitive tasks you've already validated — not to explore something new without supervision.</p>
+  <p>When a prompt chains several steps together with conditional logic between them, it's usually called a <strong>prompt-workflow</strong>. It's still a prompt — it just has more than one step.</p>
+
+  <h2>How a prompt file is structured</h2>
+  <p>A prompt lives as a file with two parts: a YAML front matter and a body with the steps.</p>
+
+  <pre><code>---
+agent: agent
+model: Claude Sonnet 5
+description: 'Creates a maintenance log table and page for a RentalFlow asset.'
+tools: [read, edit/editFiles, search, 'al-symbols-mcp/*']
+---</code></pre>
+
+  <p>Four fields do all the work:</p>
+  <ul>
+    <li><strong>agent</strong>: marks it as a workflow capable of running tools, not a plain conversation.</li>
+    <li><strong>model</strong>: which model must run this specific task — if the rest of your session is on a different model, invoking the prompt switches it automatically.</li>
+    <li><strong>description</strong>: a one-line summary so the right prompt gets suggested at the right moment.</li>
+    <li><strong>tools</strong>: a closed list of allowed tools. The prompt never gets access to "everything available" — only to what that specific task needs.</li>
+  </ul>
+  <p>The body adds guardrails (what never to do) and the numbered steps: read context, decide which skills to load based on the task's domain, generate the result, and — the step that actually makes the difference — stop before applying anything.</p>
+
+  <figure>
+    <img src="../assets/images/promptStructure.png" alt="Front matter and step sequence of a prompt-workflow file in .github/prompts">
+  </figure>
+
+  <h2>Where it lives and how you call it</h2>
+  <p>Prompts live in <code>.github/prompts/</code> inside the repository, one file per task. To run one, you just type <code>/</code> followed by the file name in the agent chat — Copilot detects it automatically and executes it.</p>
+
+  <h2>A practical case: a maintenance log for RentalFlow</h2>
+  <p>To see it in action: RentalFlow is the equipment rental app used as the case study. Each piece of equipment already has its own card; what's missing is an associated maintenance log — every time a machine goes in or out of maintenance, it gets recorded.</p>
+  <p>The prompt that solves this loads three skills in its Step 2, depending on what the task actually needs:</p>
+  <ul>
+    <li><strong>skill-tables</strong> — how the new table should be designed: primary key, <code>DataClassification</code>, ID range.</li>
+    <li><strong>skill-relations</strong> — how it relates to the existing equipment table.</li>
+    <li><strong>skill-permissions</strong> — how the permission set gets updated, because every new object needs an entry in it.</li>
+  </ul>
+  <p>None of the three loads "just in case" — the prompt itself decides which ones apply based on what it's about to build.</p>
+
+  <h2>The guardrail that matters most: the human checkpoint</h2>
+  <p>Before writing a single file, the prompt generates the full result — table, page, and permission entries — and shows it in the chat without touching disk. It stops there and waits for explicit approval.</p>
+  <p>That checkpoint (human-in-the-loop, or HITL) isn't a decorative step: it's what turns automation into something controllable. The model can automate all the mechanical work — reading context, deciding which knowledge applies, generating correct code — but the final call of "this is what I want" still belongs to a human. Only after an explicit "go ahead" does the prompt move to the last step: writing the <code>.al</code> files and updating the permission set.</p>
+
+  <figure>
+    <img src="../assets/images/promptStop.png" alt="Prompt-workflow stopping for human review before writing any files to disk">
+  </figure>
+
+  <h2>Instructions, skills, and prompts, working together</h2>
+  <p>The three pieces fit together like this: the instruction sets the rule that never changes (prefixes, mandatory <code>DataClassification</code>), the skill provides domain-specific knowledge (how to properly build a table, a relation, a permission set), and the prompt ties all of that to a concrete task — with minimal tools and a human checkpoint before anything becomes permanent.</p>
+
+  <div class="callout">Watch the full walkthrough — the video below (in Spanish) shows this exact prompt running live in Visual Studio Code, from invocation to the human approval step and the final generated AL objects.</div>
+
+  <h2>Video walkthrough</h2>
+  <div class="video-embed">
+    <iframe src="https://www.youtube-nocookie.com/embed/REPLACE_WITH_VIDEO_ID" title="Agentic Development in Business Central — Prompts" allow="accelerate; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+  </div>
+
+  <p>The natural next step is to stop telling the agent, prompt by prompt, what to run — and let an <strong>agent</strong> orchestrate the whole sequence on its own. That's what the next entry in this series will cover.</p>
+</main>
+
+<div class="statusbar">
+  <span>main</span>
+  <span><a href="../index.html">← back to index</a></span>
+</div>
+
+</body>
+</html>
