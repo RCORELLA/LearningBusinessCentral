@@ -35,7 +35,7 @@
   <p>This article continues the series on agentic development in Business Central, moving from instructions and skills to the piece that ties them together into a controlled workflow.</p>
 
   <figure>
-    <img src="../assets/images/promptsOverview.png" alt="GitHub Copilot agent mode executing a prompt-workflow for AL development">
+    <img src="../assets/images/prompt-01.png" alt="GitHub Copilot agent mode executing a prompt-workflow for AL development">
   </figure>
 
   <h2>What a prompt is (and isn't)</h2>
@@ -62,7 +62,7 @@ tools: [read, edit/editFiles, search, 'al-symbols-mcp/*']
   <p>The body adds guardrails (what never to do) and the numbered steps: read context, decide which skills to load based on the task's domain, generate the result, and — the step that actually makes the difference — stop before applying anything.</p>
 
   <figure>
-    <img src="../assets/images/promptStructure.png" alt="Front matter and step sequence of a prompt-workflow file in .github/prompts">
+    <img src="../assets/images/prompt-arbol.png" alt="Front matter and step sequence of a prompt-workflow file in .github/prompts">
   </figure>
 
   <h2>Where it lives and how you call it</h2>
@@ -83,7 +83,7 @@ tools: [read, edit/editFiles, search, 'al-symbols-mcp/*']
   <p>That checkpoint (human-in-the-loop, or HITL) isn't a decorative step: it's what turns automation into something controllable. The model can automate all the mechanical work — reading context, deciding which knowledge applies, generating correct code — but the final call of "this is what I want" still belongs to a human. Only after an explicit "go ahead" does the prompt move to the last step: writing the <code>.al</code> files and updating the permission set.</p>
 
   <figure>
-    <img src="../assets/images/promptStop.png" alt="Prompt-workflow stopping for human review before writing any files to disk">
+    <img src="../assets/images/prompt-hitl.png" alt="Prompt-workflow stopping for human review before writing any files to disk">
   </figure>
 
   <h2>Instructions, skills, and prompts, working together</h2>
