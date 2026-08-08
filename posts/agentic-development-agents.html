@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic Development in Business Central: Turning Prompts into Persistent Agents</title>
+<meta name="description" content="How instructions, skills and prompts come together into a persistent agent role with its own tools, model, and handoff logic — with a working requirements-consultant example for AL development.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div class="titlebar">
+<span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+<span class="path">learning-business-central — posts/agentic-development-agents.html</span>
+</div>
+<div class="tabbar">
+<div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+<div class="tab active"><span>agentic-development-agents</span><span class="ext">.html</span></div>
+</div>
+<main>
+<div class="eyebrow">posts / agentic-development</div>
+<h1>Agentic Development in Business Central: Turning Prompts into Persistent Agents</h1>
+<p class="post-meta"><span class="author">Roberto Corella</span> <span class="date">August 8, 2026</span> <span class="tags">AL · Agentic Development · GitHub Copilot</span></p>
+
+<p>Instructions, skills and prompts each solve one piece of the automation puzzle — but every one of them still needs you to press the trigger. You pick the prompt, you decide which skill applies, you remember which rules are active for this task. Fourth entry in the series: what happens when all three pieces are wrapped into a role with its own memory, one that decides for itself what it needs at each step? That's an <strong>agent</strong>, and it's the subject of this article.</p>
+
+<p>This entry continues the series on agentic development in Business Central, moving from single-shot prompts to a persistent role that knows what belongs to it, refuses what doesn't, and knows when to pass the work along.</p>
+
+<img src="../assets/images/general.png" alt="GitHub Copilot agent mode with a custom Requirements Consultant agent selected">
+
+<h2>Prompt vs. agent: a different kind of building block</h2>
+
+<p>A prompt is a one-shot instruction: you invoke it, it runs, it's done. It does exactly what the text says, exactly once, and nothing outlives that single call.</p>
+
+<p>An agent is different in kind, not just in degree. It's a persistent role with an identity: a requirements consultant, a solution architect, a developer. Each role gets exactly the tools its job requires — nothing more — and moves through its own sequence of states as the work progresses.</p>
+
+<p>Two behaviors set an agent apart from a plain prompt:</p>
+
+<ul>
+<li>It <strong>declines work that isn't its job</strong>. A requirements consultant that gets asked "which table should I create for this" pushes back — that's not a functional question, it belongs to the architect.</li>
+<li>It <strong>knows when its part is finished</strong> and who should pick up from there, instead of trying to carry the task through to the end on its own.</li>
+</ul>
+
+<p>Put simply: a prompt answers a question. An agent holds a conversation under a fixed set of rules, says no to what it shouldn't do, and hands the baton to the next agent at the right moment.</p>
+
+<h2>The anatomy of an agent</h2>
+
+<p>An agent is defined by a small set of properties that decide who it is, what it can touch, and where its output goes next.</p>
+
+<p><strong>Name and description.</strong> The name gives the role an identity — <em>Business Central Requirements Consultant</em>, in our case — and the description states its purpose in a line: gathering and validating functional requirements before anything technical gets decided.</p>
+
+<p><strong>Tools.</strong> This is where the boundaries get real. An agent only gets access to what its role actually needs: reading files, editing files, searching, calling a specific MCP server. You can go further and restrict it to creating new files only, never touching what already exists — a small constraint that makes the agent's behavior far more predictable, because "I might overwrite something" simply isn't an option it has.</p>
+
+<p><strong>Model.</strong> Each agent can run on a different model depending on how demanding its task actually is. A consultant drafting functional prose doesn't need the same reasoning horsepower as an architect working out a technical design from scratch. Splitting models by role isn't just about quality — it's a direct token-cost decision: you don't pay for the expensive model on tasks that don't need it.</p>
+
+<p><strong>Handoff.</strong> This is the property that didn't exist in plain instructions or standalone prompts: who receives the work once this agent is done. The requirements consultant, once its functional specification is complete, hands off automatically to the solution architect, with an instruction telling it exactly what to do next: turn this functional spec into a technical one.</p>
+
+<img src="../assets/images/dondeGuardarAgentes.png" alt="Agent definition file showing name, description, tools, model and handoff properties">
+
+<h3>Inside the requirements-consultant agent</h3>
+
+<p>Beyond the core properties, this agent's definition spells out its behavior in detail:</p>
+
+<ul>
+<li><strong>Role:</strong> act as a functional consultant only, never technical. No object names, no table names, no data structures — that's the architect's territory.</li>
+<li><strong>Guiding principle:</strong> never invent. If something is unclear, ask. The agent's job is to surface every functional gap before a single technical decision gets made.</li>
+<li><strong>Workflow:</strong> read what the client sent, ask for anything missing, identify the functional gaps that still need clarifying, and only then generate the specification document.</li>
+<li><strong>Document format:</strong> a short, human-readable name, an initial "draft" status — because the client still needs to confirm it — a summary of what was understood, a list of open questions, and an explicit out-of-scope section.</li>
+<li><strong>Human checkpoint:</strong> the workflow pauses at a defined step and waits for a human decision before treating the specification as final — the same human-in-the-loop pattern from the prompts entry in this series, now built into the agent's own behavior rather than left to whoever invokes it.</li>
+<li><strong>Explicit limits:</strong> the agent must not propose technical solutions, must not paper over ambiguity, and must not decide which tables will be used. Its only job is to produce a complete and correct functional definition.</li>
+</ul>
+
+<p>Agents live in a <code>.github/agents</code> folder, right alongside the <code>.github/skills</code> and <code>.github/prompts</code> folders from earlier entries in this series. Two agents live there so far — consultant and architect — though this article only puts the first one to work.</p>
+
+<h2>Where agents live and how you call them</h2>
+
+<p>Once an agent is defined, it shows up directly in Copilot's mode selector, next to the usual <em>agent</em>, <em>ask</em>, and <em>plan</em> options — no need to invoke a specific prompt or remember which skill applies. Selecting a custom agent changes the whole conversation from that point on: everything you type from then on is filtered through that agent's rules, tools, and workflow, instead of running against a generic assistant.</p>
+
+<h2>A practical case: equipment reservations for RentalFlow</h2>
+
+<p>RentalFlow, the equipment-rental case study used throughout this series, already has a card for every piece of equipment, tracking its status — rented, available, in maintenance. The client emails a new request: on top of renting equipment outright, they now want to be able to <strong>reserve</strong> it ahead of time, with the option to cancel a reservation later.</p>
+
+<p>That email, pasted as-is, is the only input the requirements-consultant agent gets. There's no prompt to pick, no skill to load manually — the agent's own role definition already tells it what to do with a raw client request.</p>
+
+<img src="../assets/images/invocarAgentes.png" alt="Draft functional specification generated by the agent, with open questions for the client">
+
+<p>The result is a draft specification that summarizes what was understood and, more importantly, raises exactly the kind of functional questions a senior consultant would ask before agreeing to anything: can a currently rented item still be reserved for a future date? Does a cancellation need a recorded reason? Is there a maximum lead time for a reservation? These aren't implementation questions — they're the ones a consultant would raise in a requirements meeting, now made explicit and documented before a single line of code exists.</p>
+
+<p>Once those questions are answered, the agent regenerates the specification — no open questions left — and saves it in a "ready for architecture" state. In practice, that document is the functional contract you'd hand the client to sign off on: no tables, no objects, nothing technical, just the agreed scope.</p>
+
+<h2>The handoff in action: from consultant to architect</h2>
+
+<p>This is where the handoff property earns its place. The consultant agent's definition names its recipient explicitly — the solution architect — and pairs that with a concrete instruction that fires automatically: generate the technical specification from the functional specification that was just produced.</p>
+
+<p>It's worth noting this pattern isn't only useful for developers. It works just as well for the consulting side of the job — catching questions you might not have thought to ask, and leaving a clear paper trail of every functional decision before the technical work even starts.</p>
+
+<img src="../assets/images/handOff.png" alt="Automatic handoff from the requirements-consultant agent to the solution-architect agent in Copilot Chat">
+
+<p>Watch the full walkthrough — the video below (in Spanish) shows this exact agent running live, from the client's email to the handoff to the architect.</p>
+
+<h2>Video walkthrough</h2>
+
+<div class="video-embed">
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/4c5q1_pmcLo" title="Agentic Development in Business Central: agents" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</div>
+
+<p>With the functional specification handed off, the natural next step is to see how it turns into a technical specification, and how that technical specification then drives the actual AL development. That's what the next entry in this series will cover.</p>
+
+</main>
+<div class="statusbar">
+<span>main</span>
+<span><a href="https://github.com/RCORELLA/LearningBusinessCentral">github.com/RCORELLA/LearningBusinessCentral</a></span>
+</div>
+</body>
+</html>
