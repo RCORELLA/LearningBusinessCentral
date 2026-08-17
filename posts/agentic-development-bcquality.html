@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BC Quality: Auditing Your Business Central Code (Human-Written or Agent-Written)</title>
+<meta name="description" content="Fifth entry in the agentic development series — how Microsoft's BC Quality knowledge base lets you objectively audit AL code, whether written by an agent or by a human, with a reviewer agent and a readable HTML report.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" type="image/png" sizes="48x48" href="../assets/images/favicon.png">
+</head>
+<body>
+<div class="titlebar">
+<span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+<span class="path">learning-business-central — posts/agentic-development-bcquality.html</span>
+</div>
+<div class="tabbar">
+<div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+<div class="tab active"><span>agentic-development-bcquality</span><span class="ext">.html</span></div>
+</div>
+<main>
+<div class="eyebrow">posts / agentic-development</div>
+<h1>BC Quality: Auditing Your Business Central Code (Human-Written or Agent-Written)</h1>
+<p class="post-meta"><span class="author">Roberto Corella</span> <span class="date">August 17, 2026</span> <span class="tags">AL · Agentic Development · GitHub Copilot</span></p>
+
+<p>Whenever I talk about building Business Central extensions with agents, one criticism comes up again and again: we're losing control over what gets generated. And it's a fair point. An agent can write code that compiles and runs perfectly fine while still carrying hidden issues — a missing <code>ToolTip</code>, a performance anti-pattern, an event handled the wrong way. Nothing that breaks the build, but exactly the kind of thing a good code reviewer would catch immediately.</p>
+<figure>
+    <img src="../assets/images/bcquality_reviewer.png" alt="Agent reviewer">
+  </figure>
+<p>Microsoft recently released a tool built specifically for this problem: <strong>BC Quality</strong>, a knowledge repository of best practices that lets you objectively validate how well-built your AL code actually is. And here's the important nuance: it isn't limited to reviewing agent-generated code. It works exactly the same way for code you write yourself. Fifth entry in the series.</p>
+
+<h2>What BC Quality is — and isn't</h2>
+
+<p>BC Quality doesn't execute anything. It's not a linter, it doesn't compile, it doesn't run real-time analysis. It's a knowledge base made of Markdown files documenting the best practices and patterns any Business Central development should follow. The core idea is simple but powerful: <strong>the same bar applies to everyone</strong>. The rules that apply to a human developer apply identically to an agent. No exceptions.</p>
+
+<p>It's equally important to understand what falls outside its scope. BC Quality isn't meant to catch things a model already knows to flag on its own — an HTTP URL that should be HTTPS, or a hard-coded secret sitting in plain text, are things any reasonably capable model already detects without an external knowledge base. BC Quality focuses on what a model, by default, doesn't know it should be checking: Business Central–specific conventions around performance, security, error handling, events, and telemetry.</p>
+
+<h3>Three layers of rules</h3>
+
+<p>The system is organized into three layers, applied in order of precedence:</p>
+
+<ul>
+<li><strong>Microsoft:</strong> the official layer, reviewed and maintained by the Business Central product team.</li>
+<li><strong>Community:</strong> rules proposed by the community. If Microsoft decides a community rule is solid enough, it can be promoted to the official layer.</li>
+<li><strong>Custom:</strong> your own layer, empty by default, where each partner or company adds its internal rules on top of Microsoft's and the community's.</li>
+</ul>
+
+<p>All three layers are active at the same time. Where rules conflict, precedence resolves the order.</p>
+
+<p>Since it's open source, anyone can propose new rules — as long as they add something a model wouldn't catch on its own, not just a restatement of the obvious.</p>
+
+<h2>Setting up BC Quality in a project</h2>
+
+<p>The workflow has three clear steps: bring in the repository, build a knowledge index, and create a reviewer agent that uses it.</p>
+
+<h3>1. Fork the repository</h3>
+
+<p>The first step is bringing BC Quality into your own project as a git submodule. A single PowerShell command creates the submodule inside a <code>.bcquality</code> folder and pulls in everything: Microsoft's rules, the community's rules, and an empty custom folder waiting for your own standards.</p>
+
+<figure>
+    <img src="../assets/images/bcquality_directory.png" alt="BC Quality directory structure">
+</figure>
+
+<h3>2. Build the knowledge index</h3>
+
+<p>With dozens of knowledge files available, re-reading all of them on every run would burn through tokens for no reason. The fix is generating an <strong>index</strong> first (<code>Build-KnowledgeIndex.ps1</code>) that summarizes where each piece of knowledge lives. The reviewer agent checks that index first and only fetches the full document when it actually needs it.</p>
+
+<p>This index needs to be generated the first time and regenerated whenever new knowledge files show up — whether Microsoft publishes new rules, the community contributes its own, or you fill in your custom layer. As a general rule of thumb, each knowledge file should stay under 100 lines, ideally around 50, so it stays easy to consult and maintain.</p>
+
+<h3>3. Create the reviewer agent</h3>
+
+<p>With the repository and the index in place, the next step is building an agent whose only source of truth is BC Quality. This agent needs to:</p>
+
+<ul>
+<li>Locate the BC Quality repository and confirm the index exists, regenerating it if needed.</li>
+<li>Support both single-file mode and batch mode (reviewing an entire folder, such as <code>src</code>).</li>
+<li>Warn when the number of files to review is high — more than 15, in my setup — to avoid losing context along the way, and allow reviewing in smaller batches instead.</li>
+<li>Invoke the repository's entry point, which routes to the relevant read/execute skills depending on what's needed, always respecting layer precedence.</li>
+<li>Clearly distinguish findings backed by the knowledge base from the model's own judgment — never fabricating a path or attributing something to BC Quality that isn't actually there.</li>
+</ul>
+
+<p>The output of each review is a JSON file per analyzed file, including the review date, the source of each finding, and the full detail — no shortened summaries.</p>
+
+<h2>From JSON to a readable report</h2>
+
+<p>A JSON file per source file is fine for processing but awkward to read at a glance. That's why the workflow finishes by generating a small JavaScript script that walks through the generated JSON files along with the knowledge index and produces a readable <strong>HTML report</strong>: for every reviewed file, what was found, which domain it belongs to (UI, performance, style...), and — most importantly — exactly which part of BC Quality each finding comes from.</p>
+
+<p>That last point is where most of the practical value sits: when the report flags an issue, it points to the exact knowledge rule behind it. If a finding doesn't carry that reference, it's flagged as coming from the model's own judgment — never presented as if it came from BC Quality when it didn't.</p>
+
+<figure>
+    <img src="../assets/images/bcquality_html_result.png" alt="BC Quality HTML report">
+</figure>
+
+<h2>The practical takeaway</h2>
+
+<p>Running this workflow against a full <code>src</code> folder produces a report that clearly separates three layers of value: what Microsoft contributes, what the community contributes, and what your own accumulated experience contributes through the custom layer. Not every file will have findings — some come back clean — and in other cases the agent may flag something relevant that isn't yet captured as a formal BC Quality rule, which is itself useful signal for deciding whether it's worth turning into a new community rule.</p>
+
+<p>My recommendation is to make this review a routine step, not a one-off — for code your agents generate and for code you write yourself. The goal isn't to replace the developer's judgment, but to augment it with a consistent, objective verification layer for the whole team.</p>
+
+<p>If you work on AL development, with or without agents, this is a tool worth adding to your workflow sooner rather than later.</p>
+
+<p>Stay tuned for the next entry in the series, where we continue exploring agents, skills, and prompts applied to Business Central.</p>
+
+<div class="callout">Watch the full walkthrough — the video below shows an example.</div>
+
+  <h2>Video walkthrough</h2>
+  <div class="video-embed">
+    <iframe src="https://www.youtube-nocookie.com/embed/aQG67quBHHQ" title="Agentic Development in Business Central — Instructions" allow="accelerate; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+  </div>
+
+
+<div class="callout">
+If you found this content useful, you can <a href="https://buymeacoffee.com/rcorella" target="_blank" rel="noopener">buy me a coffee</a> — it helps me keep writing and recording. Thank you!
+</div>
+
+</main>
+<div class="statusbar">
+<span>main</span>
+<span><a href="https://github.com/RCORELLA/LearningBusinessCentral">github.com/RCORELLA/LearningBusinessCentral</a></span>
+</div>
+<script data-goatcounter="https://learningbusinesscentral.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
