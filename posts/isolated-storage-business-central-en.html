@@ -5,33 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="How Isolated Storage in Business Central lets you keep API keys, client secrets and passwords out of reach of the database, the debugger and third-party extensions, with a practical Set/Get/Contains/Delete walkthrough.">
 <title>Isolated Storage in Business Central: The Right Way to Keep Your Secrets Safe</title>
-<link rel="stylesheet" href="../styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" type="image/png" sizes="48x48" href="../assets/images/favicon.png">
 </head>
 <body>
-
-<header>
-  <nav class="breadcrumb">
-    <a href="../index.html">index.html</a> &raquo;
-    <span>posts/isolated-storage-business-central.html</span>
-  </nav>
-  <p class="path">posts / al-development</p>
-</header>
-
+<div class="titlebar">
+<span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+<span class="path">learning-business-central — posts/isolated-storage-business-central-en.html</span>
+</div>
+<div class="tabbar">
+<div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+<div class="tab active"><span>isolated-storage-business-central-en</span><span class="ext">.html</span></div>
+</div>
 <main>
-  <article>
-    <h1>Isolated Storage in Business Central: The Right Way to Keep Your Secrets Safe</h1>
-
-    <p class="byline">
-      Roberto Corella &middot; August 25, 2026 &middot;
-      <span class="tags">AL &middot; Isolated Storage &middot; Security</span>
-    </p>
+<div class="eyebrow">posts / al-development</div>
+<h1>Isolated Storage in Business Central: The Right Way to Keep Your Secrets Safe</h1>
+<p class="post-meta"><span class="author">Roberto Corella</span> <span class="date">August 25, 2026</span> <span class="tags">AL · Isolated Storage · Security</span></p>
 
     <p>I see this question come up almost every time I run an AL training: "where do I put the API key for this integration?" And nine times out of ten, the answer someone tries first is a plain text field on a table, maybe with a mask on top so it shows asterisks on screen. It feels safe enough, until you remember that table is sitting in a SQL database that plenty of tools and plenty of people can reach.</p>
 
     <p>Business Central already ships with a proper answer to this problem: <strong>Isolated Storage</strong>. It's been there for years, but a lot of developers still don't reach for it by default. Here's what it is, how it actually works under the hood, and how to wire it into a real extension.</p>
 
+<figure>
+<img src="../assets/images/isolate_main.png" alt="Isolated Storage in Business Central: keeping secrets out of the database, the debugger and third-party extensions">
+</figure>
+
     <h2>Why a masked field isn't enough</h2>
     <p>A field with <code>ExtendedDatatype = Masked</code> hides the value on the page, replacing it with asterisks. That's a reasonable first move, but it only protects the screen. Anyone who builds a new page over the same table, without applying that mask, sees the raw value. And if someone with bad intentions ships their own extension pointing at your table, they read the key directly. The mask is cosmetic. The data underneath is still sitting there, unprotected.</p>
+
+<figure>
+<img src="../assets/images/isolateMasked.png" alt="Masked field in Business Central showing asterisks on the page while the value stays readable in the underlying table">
+</figure>
 
     <h2>So what is Isolated Storage, really</h2>
     <p>Isolated Storage is a system table already built into Business Central. You don't design it, Microsoft did, and you interact with it through a small set of built-in functions instead of writing SQL against it yourself:</p>
@@ -61,19 +67,23 @@
     <h2>Wrapping up</h2>
     <p>Isolated Storage solves a concrete problem: keeping credentials out of reach of the database, the debugger, and any extension that isn't yours, without giving up the convenience of storing them inside Business Central itself. Combine <code>Set</code>, <code>Get</code>, <code>Contains</code> and <code>Delete</code> with <code>SecretText</code> and an <code>Internal</code> access modifier, and none of those three attack paths gets you anywhere. If your extension handles API keys, client secrets, or anything else confidential, this is the pattern to reach for instead of a text field with a mask on it.</p>
 
-    <h2>Video walkthrough</h2>
-    <p>The video below shows this working end to end inside a real extension.</p>
-    <div class="video-embed">
-      <iframe width="640" height="360" src="https://www.youtube-nocookie.com/embed/zKk-W6QoS7E" title="Isolated Storage in Business Central" frameborder="0" allowfullscreen></iframe>
-    </div>
+<div class="callout">Watch the full walkthrough — the video below shows this working end to end inside a real extension.</div>
 
-    <p class="support">If you found this content useful, you can <a href="https://buymeacoffee.com/rcorella">buy me a coffee</a>, it helps me keep writing and recording. Thank you!</p>
-  </article>
+<h2>Video walkthrough</h2>
+<div class="video-embed">
+<iframe src="https://www.youtube-nocookie.com/embed/zKk-W6QoS7E" title="Isolated Storage in Business Central" allow="accelerate; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+</div>
+
+<div class="callout">
+If you found this content useful, you can <a href="https://buymeacoffee.com/rcorella" target="_blank" rel="noopener">buy me a coffee</a> — it helps me keep writing and recording. Thank you!
+</div>
+
 </main>
-
-<footer>
-  <p>main <a href="https://github.com/RCORELLA/LearningBusinessCentral">github.com/RCORELLA/LearningBusinessCentral</a></p>
-</footer>
-
+<div class="statusbar">
+<span>main</span>
+<span><a href="../index.html">← back to index</a></span>
+</div>
+<script data-goatcounter="https://learningbusinesscentral.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
