@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="How Isolated Storage in Business Central lets you keep API keys, client secrets and passwords out of reach of the database, the debugger and third-party extensions, with a practical Set/Get/Contains/Delete walkthrough.">
+<title>Isolated Storage in Business Central: The Right Way to Keep Your Secrets Safe</title>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<header>
+  <nav class="breadcrumb">
+    <a href="../index.html">index.html</a> &raquo;
+    <span>posts/isolated-storage-business-central.html</span>
+  </nav>
+  <p class="path">posts / al-development</p>
+</header>
+
+<main>
+  <article>
+    <h1>Isolated Storage in Business Central: The Right Way to Keep Your Secrets Safe</h1>
+
+    <p class="byline">
+      Roberto Corella &middot; August 25, 2026 &middot;
+      <span class="tags">AL &middot; Isolated Storage &middot; Security</span>
+    </p>
+
+    <p>I see this question come up almost every time I run an AL training: "where do I put the API key for this integration?" And nine times out of ten, the answer someone tries first is a plain text field on a table, maybe with a mask on top so it shows asterisks on screen. It feels safe enough, until you remember that table is sitting in a SQL database that plenty of tools and plenty of people can reach.</p>
+
+    <p>Business Central already ships with a proper answer to this problem: <strong>Isolated Storage</strong>. It's been there for years, but a lot of developers still don't reach for it by default. Here's what it is, how it actually works under the hood, and how to wire it into a real extension.</p>
+
+    <h2>Why a masked field isn't enough</h2>
+    <p>A field with <code>ExtendedDatatype = Masked</code> hides the value on the page, replacing it with asterisks. That's a reasonable first move, but it only protects the screen. Anyone who builds a new page over the same table, without applying that mask, sees the raw value. And if someone with bad intentions ships their own extension pointing at your table, they read the key directly. The mask is cosmetic. The data underneath is still sitting there, unprotected.</p>
+
+    <h2>So what is Isolated Storage, really</h2>
+    <p>Isolated Storage is a system table already built into Business Central. You don't design it, Microsoft did, and you interact with it through a small set of built-in functions instead of writing SQL against it yourself:</p>
+    <ul>
+      <li><strong>Set</strong> stores a value under a key.</li>
+      <li><strong>Get</strong> retrieves the value for a key.</li>
+      <li><strong>Contains</strong> checks whether a key already has a stored value.</li>
+      <li><strong>Delete</strong> removes the value for a key.</li>
+    </ul>
+    <p>Every entry carries context beyond just the key-value pair: which extension wrote it, which company, and which user. That context is what lets you choose a <strong>scope</strong>. Company scope makes a value available to any user working in that company, which is the common choice for something like a shared API key. User scope keeps it tied to a single person. There's also module and combined company-and-user scope for narrower cases.</p>
+
+    <h2>Where the difference actually shows up</h2>
+    <p>Open the page inspector (Ctrl+Alt+F1) on a masked field backed by a normal table, and you'll still see asterisks. That part works fine. The real issue is that the value is still reachable through the underlying data model no matter what the page shows. Isolated Storage removes that problem at the root: the value never lives in a regular table field at all. The moment you save it, it disappears from any visible field and becomes something only the system codeunit can hand back to you.</p>
+
+    <h2>Putting it together: Set, Contains, Delete, Get</h2>
+    <p>A typical flow looks like this in practice.</p>
+    <p>Before writing a new value, check with <code>Contains</code> whether a key already exists, and if it does, remove it first with <code>Delete</code>. That avoids stepping on an old value or ending up with a conflict when you write the new one.</p>
+    <p>When you save with <code>Set</code>, give the key a descriptive name (something like <code>ABC External Service API Key</code> works well), and wrap the value in a <code>SecretText</code> rather than a plain <code>Text</code>. <code>SecretText</code> adds a layer most developers don't think about: its content can't be inspected even while stepping through the extension in the debugger. It stays hidden for its entire lifetime, not just once it's saved.</p>
+    <p>When the extension needs the value later, say to authenticate an HTTP call, check <code>Contains</code> first, then read it back with <code>Get</code>, again as a <code>SecretText</code>, so it stays unreadable even under a debugging session.</p>
+
+    <h2>One more layer: mark the codeunit Internal</h2>
+    <p>Storing the value in Isolated Storage isn't the end of the story if anyone can build an extension that calls your read procedures directly. Declaring the codeunit that wraps this access, or at least its read methods, as <strong>Internal</strong> closes that gap. A dependent extension can no longer call those procedures from outside and pull the value out. It's a small change that meaningfully shrinks the attack surface, even for someone who already knows the key exists.</p>
+
+    <h2>Where this earns its keep</h2>
+    <p>This pattern is worth reaching for anywhere your extension touches something sensitive: API keys for external services, client secrets in OAuth integrations, and credentials for the AI calls that are now part of almost every project, whether that's GPT, Azure AI, or something similar. Given how many integrations a typical Business Central setup connects to today, treating secret storage as an afterthought isn't really an option anymore.</p>
+
+    <h2>Wrapping up</h2>
+    <p>Isolated Storage solves a concrete problem: keeping credentials out of reach of the database, the debugger, and any extension that isn't yours, without giving up the convenience of storing them inside Business Central itself. Combine <code>Set</code>, <code>Get</code>, <code>Contains</code> and <code>Delete</code> with <code>SecretText</code> and an <code>Internal</code> access modifier, and none of those three attack paths gets you anywhere. If your extension handles API keys, client secrets, or anything else confidential, this is the pattern to reach for instead of a text field with a mask on it.</p>
+
+    <h2>Video walkthrough</h2>
+    <p>The video below shows this working end to end inside a real extension.</p>
+    <div class="video-embed">
+      <iframe width="640" height="360" src="https://www.youtube-nocookie.com/embed/zKk-W6QoS7E" title="Isolated Storage in Business Central" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <p class="support">If you found this content useful, you can <a href="https://buymeacoffee.com/rcorella">buy me a coffee</a>, it helps me keep writing and recording. Thank you!</p>
+  </article>
+</main>
+
+<footer>
+  <p>main <a href="https://github.com/RCORELLA/LearningBusinessCentral">github.com/RCORELLA/LearningBusinessCentral</a></p>
+</footer>
+
+</body>
+</html>
