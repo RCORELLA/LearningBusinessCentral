@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="How to centralize your GitHub Copilot instructions, prompts and skills in a single user-level folder so they travel with you across every VS Code project, instead of living inside one repository.">
+<title>How to Use Your GitHub Copilot Skills, Prompts and Instructions Across Every VS Code Project</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" type="image/png" sizes="48x48" href="../assets/images/favicon.png">
+</head>
+<body>
+<div class="titlebar">
+<span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+<span class="path">learning-business-central — posts/copilot-skills-prompts-instructions-en.html</span>
+</div>
+<div class="tabbar">
+<div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+<div class="tab active"><span>copilot-skills-prompts-instructions-en</span><span class="ext">.html</span></div>
+</div>
+<main>
+<div class="eyebrow">posts / vs-code</div>
+<h1>How to Use Your GitHub Copilot Skills, Prompts and Instructions Across Every VS Code Project</h1>
+<p class="post-meta"><span class="author">Roberto Corella</span> <span class="date">September 15, 2026</span> <span class="tags">GitHub Copilot · VS Code · Agentic Development</span></p>
+
+<p>If you work with GitHub Copilot in agent mode across several Business Central projects, you've probably run into this: every time you open a new project, your skills, your prompts and your instructions simply aren't there. You end up copying the whole <code>.github</code> folder over again, and from that point on you're maintaining several copies that slowly drift apart.</p>
+
+<p>This article covers how to centralize all of that material in a single folder on your machine, and how to tell Visual Studio Code to use it in any project you open, without copying anything.</p>
+
+<h2>The problem: your setup lives inside each project</h2>
+<p>When you put together a Copilot workflow — as we did with BC Quality or with the ALDC framework — the usual approach is to create a <code>.github</code> folder inside the project, with its own subfolders for instructions, prompts, agents and skills. It works well, but it has a clear limit: that configuration only exists in that one project.</p>
+<p>Start a new project and there's nothing there. Start work for a different client and there's nothing there either. Improve a prompt in one project and none of the others find out about it.</p>
+<p>When you work inside a single client's repository, keeping it at the repository level makes complete sense. But if you're an independent consultant or developer jumping between clients, you don't have one fixed repository to leave your way of working in. What you actually need is for your framework to travel with you, not with the project.</p>
+
+<h2>The idea: a central folder in your user profile</h2>
+<p>The solution comes down to two steps:</p>
+<ol>
+<li>Create a folder on your machine with all of your Copilot configuration.</li>
+<li>Tell VS Code, at the user settings level, where that folder is.</li>
+</ol>
+<p>Because you set this at the user level — not the workspace level — the configuration applies to any folder or project you open in VS Code.</p>
+
+<h2>Step 1: create the framework folder</h2>
+<p>Inside your Windows user folder, create a structure like this one. In my case I called it <code>ALDC Framework</code>, inside a folder I use for AL development:</p>
+
+<pre><code>C:\Users\Roberto\DesarrolloAL\ALDC Framework\
+├── instructions\
+├── prompts\
+└── agent-skills\</code></pre>
+
+<ul>
+<li><strong>instructions</strong>: the general rules for how Copilot should work — AL conventions, style, what to do and what not to do.</li>
+<li><strong>prompts</strong>: the <code>.prompt.md</code> files you run on demand, for instance create functional specification, create technical specification, or a user guide generator.</li>
+<li><strong>agent-skills</strong>: the skills the agent can load whenever it needs them.</li>
+</ul>
+<p>Move into this folder whatever you used to copy from project to project.</p>
+
+<h2>Step 2: point VS Code to that folder</h2>
+<p>Open the command palette (<code>Ctrl+Shift+P</code>), search for <em>Preferences: Open User Settings (JSON)</em>, and add the location for each type of file:</p>
+
+<pre><code>{
+  "chat.instructionsFilesLocations": {
+    "C:\\Users\\Roberto\\DesarrolloAL\\ALDC Framework\\instructions": true
+  },
+  "chat.promptFilesLocations": {
+    "C:\\Users\\Roberto\\DesarrolloAL\\ALDC Framework\\prompts": true
+  },
+  "chat.agentSkillsLocations": {
+    "C:\\Users\\Roberto\\DesarrolloAL\\ALDC Framework\\agent-skills": true
+  }
+}</code></pre>
+
+<p>Keep in mind <code>settings.json</code> is a plain text file: you can edit it, add more paths, or turn off a location by setting its value to <code>false</code>. The exact names of these settings can vary between VS Code versions, so if one of them doesn't show up, search the Settings UI filtering by "locations" under Chat.</p>
+
+<h2>Step 3: check that it works</h2>
+<p>Open a project that has no <code>.github</code> folder at all. In the Copilot chat, type <code>/</code> and you'll see your prompts already available, things like create functional specification or create technical specification.</p>
+<p>You can also confirm it from Configure Prompt Files in the chat itself: it lists the prompts from your central folder alongside any that belong to the project. From there, just run the prompt and give it the details of your requirement so it can generate, for example, the functional specification.</p>
+
+<h2>Why this makes your framework more powerful</h2>
+<p>Centralizing isn't just about convenience. It has a direct effect on the quality of what the agent produces, and it connects with one of the core ideas of agentic development:</p>
+<div class="callout">Don't fix what the agent produced — fix the skill or prompt that produced it.</div>
+<p>If the agent gets something wrong and you fix its output by hand, that fix only helps once: next time it will fail the same way again. If instead you adjust the skill, the instruction, or the prompt, the mistake disappears for good.</p>
+<p>With a central folder, that improvement propagates automatically to every project you work on. Every correction accumulates and the framework gets more reliable the more you use it, instead of being scattered across separate copies spread over every client.</p>
+
+<h2>Practical recommendation</h2>
+<ul>
+<li>Use the user-level folder for your general way of working: general instructions, specification prompts, reusable skills.</li>
+<li>Keep in the repository whatever is specific to the client or the project: business rules, team-specific conventions.</li>
+<li>Put the central folder under version control in your own repository. That way you get a change history, and you can bring it to another machine in seconds.</li>
+</ul>
+
+<div class="callout">
+If you found this content useful, you can <a href="https://buymeacoffee.com/rcorella" target="_blank" rel="noopener">buy me a coffee</a> — it helps me keep writing and recording. Thank you!
+</div>
+
+</main>
+<div class="statusbar">
+<span>main</span>
+<span><a href="../index.html">← back to index</a></span>
+</div>
+<script data-goatcounter="https://learningbusinesscentral.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
