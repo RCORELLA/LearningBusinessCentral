@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deploy Your PTEs with the Admin Center API Before Business Central v30</title>
+<meta name="description" content="Uploading extensions from the Extension Management page is going away in version 30 (2027 release wave 1). Here's how to deploy from the Admin Center instead, and how to automate it with the Admin Center API.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" type="image/png" sizes="48x48" href="../assets/images/favicon.png">
+</head>
+<body>
+<div class="titlebar">
+<span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+<span class="path">learning-business-central — posts/admin-center-pte-deployment.html</span>
+</div>
+<div class="tabbar">
+<div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+<div class="tab active"><span>admin-center-pte-deployment</span><span class="ext">.html</span></div>
+</div>
+<main>
+<div class="eyebrow">posts / deprecations</div>
+<h1>Deploy Your PTEs with the Admin Center API Before Business Central v30</h1>
+<p class="post-meta"><span class="author">Roberto Corella</span> <span class="date">September 24, 2026</span> <span class="tags">Business Central · Admin Center · API</span></p>
+
+<p>Another entry in the series on Business Central features being retired. After the one on SOAP, this time it's a change that touches almost everyone who works with extensions: uploading an app from the <strong>Extension Management</strong> page inside Business Central is going away.</p>
+
+<p>The good news is that the replacement is already available and fully working. In this post we look at what exactly changes, how to upload extensions from the Admin Center, and how to automate the whole thing with the Admin Center API.</p>
+
+<img src="../assets/images/pte.png" alt="Deploying a per-tenant extension through the Business Central Admin Center API">
+
+<h2>What's going away, and when</h2>
+
+<p>Until now the routine was straightforward: open Business Central, go to <strong>Extension Management</strong>, choose <strong>Manage &gt; Upload Extension</strong>, pick the <code>.app</code> file and you were done. Partners did it, and so did plenty of customers with their own in-house development team.</p>
+
+<p>That upload option is being removed. Microsoft already shows the warning on the page itself and documents it in the deprecated features list: starting with <strong>version 30 (2027 release wave 1, April 2027)</strong>, extensions can no longer be uploaded from Extension Management.</p>
+
+<p>It's worth being precise about the scope. The Extension Management page itself isn't disappearing — you'll still use it to review what's installed in an environment. What goes away is the <strong>upload</strong> action.</p>
+
+<p>Why the change? Centralizing deployment in the Admin Center gives administrators a single control point over what gets installed in each environment, when it gets installed, and who is allowed to do it, instead of depending on whoever happens to have access inside the application.</p>
+
+<h2>Uploading extensions from the Admin Center</h2>
+
+<p>The new path is the <strong>Business Central Admin Center</strong>, and you'll need administration permissions on the tenant to get there.</p>
+
+<ul>
+<li>Open the Admin Center and you'll see your environments listed, along with their version and upcoming updates.</li>
+<li>Pick the production environment, or the sandbox where you want to test first.</li>
+<li>Go to the <strong>Apps</strong> section. This is where you could already review installed extensions, both global (AppSource) and per-tenant.</li>
+<li>Use the new action to upload and install your extension.</li>
+</ul>
+
+<p>What makes this more than a straight replacement is the control it adds over <em>when</em> the installation happens. You can choose to:</p>
+
+<ul>
+<li><strong>Install immediately.</strong></li>
+<li><strong>Install with the next minor update</strong> — for example, when the environment moves from 28.4 to 28.5.</li>
+<li><strong>Install with the next major update.</strong></li>
+<li><strong>Schedule it inside an update window</strong> you define yourself.</li>
+</ul>
+
+<p>The <strong>sync mode</strong> option is still there too, exactly as it worked in Extension Management.</p>
+
+<p>During the transition period both methods work side by side. My recommendation is to start using the Admin Center now, so April 2027 doesn't catch you with processes that still need rewriting.</p>
+
+<h2>Automating deployment with the Admin Center API</h2>
+
+<p>If you manage a lot of customers or a lot of environments, uploading by hand through the portal doesn't scale. That's where the <strong>Admin Center API</strong> comes in: a documented REST API for managing environments and apps programmatically. Among the recent additions is exactly what we need here — uploading and managing <strong>per-tenant extensions</strong>.</p>
+
+<p>That opens up several options:</p>
+
+<ul>
+<li><strong>Community tooling.</strong> Stefano Demiliani, for instance, published an MCP server that lets an agent drive the Admin Center straight from Visual Studio Code, extension uploads included.</li>
+<li><strong>Postman</strong> or any other HTTP client, for testing or one-off deployments.</li>
+<li><strong>Your own code</strong> in .NET, Python or anything else that can authenticate against Microsoft Entra ID and issue REST calls.</li>
+<li><strong>Business Central itself</strong>, by building an extension that consumes the API.</li>
+</ul>
+
+<h3>A worked example: deployments from inside Business Central</h3>
+
+<p>In the video I walk through an extension of my own that turns Business Central into a deployment console for a partner:</p>
+
+<ul>
+<li>A setup page listing the <strong>customers</strong> (tenants) you manage.</li>
+<li>For each customer, the list of <strong>environments</strong>, with a refresh action that pulls their current state.</li>
+<li>For each environment, the <strong>installed extensions</strong>, split between PTEs and dependencies, exactly as the Admin Center shows them.</li>
+<li>An <strong>install</strong> action: pick the app — a demo API extension in this case — choose the latest version, and fire the installation against the target environment.</li>
+<li>An <strong>operations</strong> view where the installation shows up as in progress, and which you can refresh until it completes — the same status tracking the Admin Center gives you.</li>
+</ul>
+
+<p>Once the operation finishes, refreshing the extension list shows the new PTE. And if you open the environment and go to Extension Management, there it is: the page is still perfectly useful for reviewing, just not for uploading.</p>
+
+<h2>The practical takeaway</h2>
+
+<ul>
+<li><strong>Don't wait for April 2027.</strong> Start uploading through the Admin Center now, and review which internal processes or customer-facing documents still point at Extension Management.</li>
+<li><strong>Check permissions.</strong> Whoever uploads extensions from inside Business Central today will need Admin Center access, or a different process.</li>
+<li><strong>Automate if you manage several customers.</strong> The API lets you centralize deployments, schedule them inside update windows, and keep traceability of every operation.</li>
+<li><strong>Use the scheduling options.</strong> Installing with the next update, or inside a defined window, is far less disruptive for users than installing immediately.</li>
+</ul>
+
+<p>Stay tuned for the next entry, where we keep going through the features that are on their way out of Business Central.</p>
+
+<div class="callout">Watch the full walkthrough — the video below shows an example.</div>
+
+  <h2>Video walkthrough</h2>
+  <div class="video-embed">
+    <iframe src="https://www.youtube-nocookie.com/embed/QJm51o3z6lA" title="Deploy your PTEs with the Business Central Admin Center API" allow="accelerate; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+  </div>
+
+
+<div class="callout">
+If you found this content useful, you can <a href="https://buymeacoffee.com/rcorella" target="_blank" rel="noopener">buy me a coffee</a> — it helps me keep writing and recording. Thank you!
+</div>
+
+</main>
+<div class="statusbar">
+<span>main</span>
+<span><a href="https://github.com/RCORELLA/LearningBusinessCentral">github.com/RCORELLA/LearningBusinessCentral</a></span>
+</div>
+<script data-goatcounter="https://learningbusinesscentral.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
