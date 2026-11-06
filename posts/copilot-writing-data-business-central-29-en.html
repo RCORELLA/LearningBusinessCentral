@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Business Central 29 gives Copilot the ability to create and update records. Explore customer, item and payment journal examples, and the review controls that keep users in charge.">
+<title>Copilot Can Now Write Data in Business Central 29</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" type="image/png" sizes="48x48" href="../assets/images/favicon.png">
+</head>
+<body>
+<div class="titlebar">
+<span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+<span class="path">learning-business-central — posts/copilot-writing-data-business-central-29-en.html</span>
+</div>
+<div class="tabbar">
+<div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+<div class="tab active"><span>copilot-writing-data-business-central-29-en</span><span class="ext">.html</span></div>
+</div>
+<main>
+<div class="eyebrow">posts / copilot</div>
+<h1>Copilot Can Now Write Data in Business Central 29</h1>
+<p class="post-meta"><span class="author">Roberto Corella</span> <span class="date">November 5, 2026</span> <span class="tags">Business Central · Copilot · AI</span></p>
+
+<p>Until recently, Copilot in Business Central was mostly a way to ask questions: you described what you needed, and it found or explained information. With Business Central 29, part of the 2026 release wave 2, the experience is changing. Copilot can now help create and update business data as well.</p>
+
+<p>That means you can describe a customer, correct a phone number, bring products in from a web page, or prepare payment journal lines using everyday language. The important part is not just that Copilot can make changes. Business Central keeps the user involved in checking and accepting the proposed data.</p>
+
+<h2>From asking questions to getting work done</h2>
+<p>The updated Copilot experience gives you a different place to start. Instead of moving through several pages and entering every field yourself, you can explain the task in the Copilot panel and let it work through the request.</p>
+<p>Think of it as another way to interact with Business Central, not as a replacement for the application. Copilot can take care of the initial data entry or prepare a set of changes; you still decide whether the result is correct.</p>
+
+<figure>
+<img src="../assets/images/editCopilot/editCopilot.jpeg" alt="Conference announcement of Edit with Copilot in Business Central, with early access preview for partners" loading="lazy">
+<figcaption>Edit with Copilot announced at Directions EMEA 2026 in Paris.</figcaption>
+</figure>
+
+<h2>Create a customer from a short description</h2>
+<p>A straightforward first test is to ask Copilot to create a customer. In my example, I provided the customer's name, address, city, postal code and phone number, and specified that it was a domestic customer.</p>
+<p>Copilot showed the steps it was taking and used a customer template to create the record. That matters: it can build on setup that already exists in your company instead of treating every new record as a blank form. Once the customer had been created, Copilot provided a link to open the record and review it.</p>
+
+<figure>
+<img src="../assets/images/editCopilot/aiAssistant.png" alt="Concept illustration of an AI assistant creating a Business Central customer from a natural-language request" loading="lazy">
+<figcaption>Concept illustration: describe a new customer and let Copilot prepare the record for review.</figcaption>
+</figure>
+
+<h2>Review is part of the workflow</h2>
+<p>When you open the new customer card, the values proposed by Copilot are marked as needing review. They are not silently treated as verified data. You can inspect each value and accept it once you are satisfied.</p>
+<p>This human review step is a useful part of the design. AI can speed up entering information, but a person remains responsible for confirming what becomes trusted business data. It is worth taking that step even when the request seems simple.</p>
+
+<div class="callout">Let Copilot prepare the change; check the fields before you accept it.</div>
+
+<h2>Correct an existing record</h2>
+<p>Writing data is not limited to new records. I also tested a correction by asking Copilot to replace an incorrect phone number on an existing customer.</p>
+<p>Copilot found the customer and proposed the update. The new value appeared as pending review, just as it had during customer creation. After checking and accepting it, the change was reviewed. The same pattern applies: describe the change, inspect what Copilot found, and approve the proposed value.</p>
+
+<h2>Turn a web page into an item list</h2>
+<p>For a larger data-entry task, I opened a regular web page listing four products and asked Copilot, from the item list, to extract their item numbers, descriptions and sales prices and create the necessary records.</p>
+<p>Copilot first analyzed the page, then reported that it had created four rows in Business Central. Searching the item list confirmed that the products were there with their descriptions and prices. This kind of task shows how natural-language input can reduce repetitive entry when you need to bring a small catalogue into the system.</p>
+
+<figure>
+<img src="../assets/images/editCopilot/itemsCreated.jpg" alt="Copilot response confirming four item records created, with their item numbers, descriptions and unit prices" loading="lazy">
+<figcaption>Copilot confirms the four items created from the product information.</figcaption>
+</figure>
+
+<h2>Prepare payments within a budget</h2>
+<p>I also tried a finance scenario: I gave Copilot a €10,000 budget and asked it to prepare a payment journal that would cover as many overdue or soon-due vendor documents as possible.</p>
+<p>Copilot analyzed the open vendor invoices and suggested options. After I selected the option I wanted, I asked it to add the lines to the payment journal. Refreshing the page showed the prepared lines in the journal. Here, Copilot combines analysis with a practical follow-up action—but the result still deserves a careful review before posting.</p>
+
+<h2>What this means for extensions</h2>
+<p>This shift from navigation to natural-language requests is not only relevant to standard Business Central pages. Copilot can also work with data in extensions, building on its ability to use and read extension data. That opens up interesting possibilities for solutions that need to help users create or update records in their own application areas.</p>
+<p>As always, what is available depends on how the solution is built and configured. Start with a focused scenario and make sure the review process suits the data and the business risk involved.</p>
+
+<h2>Getting useful results</h2>
+<ul>
+<li><strong>Be specific.</strong> Include the values Copilot needs, such as a customer's address or an item's price, rather than leaving important details implicit.</li>
+<li><strong>Review proposed values.</strong> Treat the pending-review markers as an invitation to verify the data, not as a formality.</li>
+<li><strong>Confirm the result in Business Central.</strong> Open the record or journal and check that the right fields and amounts were created or changed.</li>
+<li><strong>Start with a small task.</strong> Try a single customer or a simple correction before moving on to a catalogue import or a payment proposal.</li>
+</ul>
+
+<p>Copilot's ability to write data makes it more than a conversational search tool: it can help turn an instruction into a prepared change in Business Central. The best part of the experience, to me, is that speed and user control are designed to work together. Let Copilot handle the first pass, then make the final call yourself.</p>
+
+<h2>Watch it in action</h2>
+<p>Want to see how it works in practice? Watch the video below for a live demonstration of Copilot creating and updating data in Business Central. You can also <a href="https://youtu.be/y77tuUI4j-U" target="_blank" rel="noopener">watch it directly on YouTube</a>.</p>
+<div class="video-embed">
+<iframe src="https://www.youtube-nocookie.com/embed/y77tuUI4j-U" title="Copilot creating and updating data in Business Central" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+</div>
+
+<div class="callout">
+If you found this content useful, you can <a href="https://buymeacoffee.com/rcorella" target="_blank" rel="noopener">buy me a coffee</a> — it helps me keep writing and recording. Thank you!
+</div>
+
+</main>
+<div class="statusbar">
+<span>main</span>
+<span><a href="../index.html">← back to index</a></span>
+</div>
+<script data-goatcounter="https://learningbusinesscentral.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
