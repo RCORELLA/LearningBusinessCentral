@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Connect Business Central 29.1 to Microsoft Fabric step by step: create a mirrored database, configure Entra ID, select tables and companies, and monitor synchronization.">
+<title>Connect Business Central to Microsoft Fabric: Step-by-Step Guide (BC 29.1)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" type="image/png" sizes="48x48" href="../assets/images/favicon.png">
+</head>
+<body>
+<div class="titlebar">
+<span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+<span class="path">learning-business-central &mdash; posts/connect-business-central-microsoft-fabric-en.html</span>
+</div>
+<div class="tabbar">
+<div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+<div class="tab active"><span>connect-business-central-microsoft-fabric-en</span><span class="ext">.html</span></div>
+</div>
+<main>
+<div class="eyebrow">posts / fabric</div>
+<h1>Connect Business Central to Microsoft Fabric: Step-by-Step Guide (BC 29.1)</h1>
+<p class="meta"><span>Roberto Corella</span> <span><time datetime="2026-11-11">November 11, 2026</time></span> <span>Business Central &middot; Microsoft Fabric &middot; Power BI</span></p>
+
+<p>For years, getting Business Central data into Power BI meant building your own integrations: APIs, scheduled exports, dataflows or intermediate processes that someone had to maintain. With version <strong>29.1</strong>, that changes: Business Central includes a native connector that <strong>replicates its data to Microsoft Fabric</strong> through a <em>mirrored database</em>.</p>
+<p>In this article, I walk through what you need, how to configure the connection from start to finish, and what to watch out for so synchronization works on the first attempt.</p>
+<div class="callout"><strong>Preview:</strong> This feature is in preview at the time of writing, so expect some rough edges. Below, I explain the issue I ran into and how I worked around it.</div>
+<p>Prefer to follow the setup on screen? <a href="#video">Watch the practical demonstration</a> below.</p>
+
+<h2>Why replicate Business Central data to Fabric?</h2>
+<p>A mirrored database in Fabric maintains a copy of the Business Central tables you select. You can build reports, dashboards, semantic models or even agents on that copy, <strong>without querying your production Business Central environment directly</strong> every time someone opens a report.</p>
+<ul>
+<li>Analytics moves out of the ERP: heavy reporting workloads no longer compete with everyday users.</li>
+<li>You choose which tables and companies to replicate, so you do not have to copy everything.</li>
+<li>The data lands in an environment designed for analytics, ready for Power BI and the other Fabric workloads.</li>
+<li>Microsoft is moving the existing Business Central Power BI apps to Fabric, so similar content will be available on this foundation.</li>
+</ul>
+
+<h2>What you need before starting</h2>
+<p>The connector relies on three pieces, and all three need to be in place:</p>
+<ol>
+<li><strong>A Business Central environment running version 29.1 or later.</strong> If yours is older, you will need to create a new environment with that version.</li>
+<li><strong>Microsoft Fabric capacity.</strong> If you do not have a subscription yet, you can activate a Fabric trial to start working and experimenting.</li>
+<li><strong>An application registered in Microsoft Entra ID</strong> to connect Business Central and Fabric.</li>
+</ol>
+
+<h2>Step 1: Create the Fabric workspace</h2>
+<p>A workspace in Fabric serves the same purpose as in Power BI: it is the place where items live and permissions are managed, but with more tools available.</p>
+<ol>
+<li>From <em>My workspace</em>, create a <strong>new workspace</strong>, for example, "Business Central".</li>
+<li>Make sure you assign it to <strong>Fabric capacity</strong> or a Fabric trial. Without capacity, you cannot create the mirrored database.</li>
+<li>Apply the changes.</li>
+</ol>
+<figure>
+<a href="../assets/images/fabric/fabricOverview.jpg" target="_blank" rel="noopener"><img src="../assets/images/fabric/fabricOverview.jpg" alt="Fabric workspace containing a Business Central mirrored database, SQL analytics endpoint, reports and a semantic model" loading="lazy"></a>
+<figcaption>The workspace brings the mirrored data and analytics together. This screenshot shows it after configuration; click any screenshot to open it at full size.</figcaption>
+</figure>
+
+<h2>Step 2: Create the mirrored database</h2>
+<p>Inside the workspace, create a new <strong>Mirrored database</strong> item and give it a descriptive name, such as "Database Business Central".</p>
+<p>Fabric takes a moment to deploy it. Once it is ready, you have an <strong>empty</strong> database: this is the destination to which Business Central will send data. Until we configure the other end, there will be nothing inside.</p>
+<figure>
+<a href="../assets/images/fabric/mirroredDataBase.jpg" target="_blank" rel="noopener"><img src="../assets/images/fabric/mirroredDataBase.jpg" alt="Fabric New item menu with the Mirrored database option" loading="lazy"></a>
+<figcaption>Create a Mirrored database item inside your Fabric workspace.</figcaption>
+</figure>
+
+<h2>Step 3: Enable API access in Fabric</h2>
+<p>This requirement is easy to overlook. In the Fabric admin portal, under tenant settings, enable the option that allows <strong>service principals to call Fabric APIs</strong>.</p>
+<p>If it is disabled, Business Central will try to connect from outside and Fabric will reject the request. This is the first setting I would check if something fails later.</p>
+
+<h2>Step 4: Register the application in Entra ID</h2>
+<p>Business Central needs an identity to authenticate with Fabric. Open the Fabric setup page in Business Central by searching for "Fabric" or using assisted setup. By default, the option to use your own app registration is not shown; enable it through <strong>Personalize</strong>.</p>
+<p>Once enabled, two additional fields appear. Microsoft has created a dedicated app registration for this scenario, and in theory you only need to enter its identifier. In my preview environment, I could not get that approach to work, so I used <strong>my own app registration</strong>, as I would for another Business Central connection. If Microsoft's registration works for you, great; otherwise, this is the alternative I used.</p>
+
+<h3>Configure the app registration</h3>
+<ol>
+<li><strong>Create the registration</strong> in Entra ID, for example, "Fabric app".</li>
+<li><strong>API permissions:</strong> add delegated <em>Power BI Service</em> permissions for workspaces. Read access should be enough for this part, but in my test I assigned both read and write because read-only access gave me problems.</li>
+<li><strong>Client secret:</strong> under <em>Certificates &amp; secrets</em>, create a new client secret.</li>
+<li><strong>Redirect URI:</strong> add the Business Central return URL, <a href="https://businesscentral.dynamics.com/OAuthLanding.htm">https://businesscentral.dynamics.com/<wbr>OAuthLanding.htm</a>.</li>
+</ol>
+<figure>
+<a href="../assets/images/fabric/appRegistrationPermisions.jpg" target="_blank" rel="noopener"><img src="../assets/images/fabric/appRegistrationPermisions.jpg" alt="Entra ID app registration showing delegated Power BI Service permissions Workspace.Read.All and Workspace.ReadWrite.All" loading="lazy"></a>
+<figcaption>The delegated workspace permissions used in my preview test.</figcaption>
+</figure>
+
+<h3>The confusing detail: the principal ID</h3>
+<p>From the app registration's overview page, you need the <strong>Application (client) ID</strong>. That is familiar enough. But the <em>principal ID</em> requested by Business Central is <strong>not that identifier</strong>.</p>
+<p>To find it, go to <strong>Enterprise applications</strong> in Entra ID, locate the application you just created, and copy its <strong>Object ID</strong>. That is the value to enter as the principal ID.</p>
+<table>
+<thead>
+<tr><th scope="col">Business Central field</th><th scope="col">Where to find it</th></tr>
+</thead>
+<tbody>
+<tr><td>Client ID</td><td>App registrations &rarr; Application (client) ID</td></tr>
+<tr><td>Client secret</td><td>App registrations &rarr; Certificates &amp; secrets</td></tr>
+<tr><td>Principal ID</td><td>Enterprise applications &rarr; Object ID</td></tr>
+</tbody>
+</table>
+
+<h2>Step 5: Give the application workspace access</h2>
+<p>With the application created in Entra ID, <strong>add it to the Fabric workspace</strong> before trying to connect Business Central:</p>
+<ol>
+<li>Open <strong>Manage access</strong> in the workspace.</li>
+<li>Add the application you registered in Entra ID.</li>
+<li>Assign at least the <strong>Contributor</strong> role.</li>
+</ol>
+<p>Without that role, you cannot connect from Business Central. Think of the application as the intermediary between Business Central and Fabric: it needs permission to write to the destination.</p>
+<figure>
+<a href="../assets/images/fabric/workspaceaccess.png" target="_blank" rel="noopener"><img src="../assets/images/fabric/workspaceaccess.png" alt="Fabric workspace Manage access panel showing the FabricApp service principal assigned the Contributor role" loading="lazy"></a>
+<figcaption>In Manage access, add your application and select Contributor from its role dropdown.</figcaption>
+</figure>
+
+<h2>Step 6: Connect Business Central to the workspace and database</h2>
+<p>On the Fabric setup page in Business Central, specify the <strong>workspace</strong> and <strong>mirrored database</strong> that should receive the data. You can enter their names or use their identifiers. Then enter the client ID, secret and principal ID from the previous steps.</p>
+<p>The setup remains incomplete until you finish every step. Once the fields are filled in, run <strong>Test connection</strong>: Business Central will ask you to authenticate and confirm whether the connection works.</p>
+<figure>
+<a href="../assets/images/fabric/fabricMirroringSetupBusinessCentral.jpg" target="_blank" rel="noopener"><img src="../assets/images/fabric/fabricMirroringSetupBusinessCentral.jpg" alt="Microsoft Fabric Mirroring Setup preview page in Business Central showing the workspace, mirrored database, data namespace and setup status" loading="lazy"></a>
+<figcaption>Configure the Fabric destination from the Microsoft Fabric Mirroring Setup page in Business Central.</figcaption>
+</figure>
+
+<h2>Step 7: Choose tables and companies</h2>
+<p>Now decide <strong>what to replicate</strong>:</p>
+<ul>
+<li><strong>Tables:</strong> add the tables you want to bring into Fabric, such as customers, items, vendors and accounts. You do not need to replicate everything.</li>
+<li><strong>Companies:</strong> if your environment has several companies, choose whether to replicate one or all of them.</li>
+</ul>
+<p>Replicating only what you need reduces data volume, synchronization time and the complexity of the models you build later.</p>
+<figure>
+<a href="../assets/images/fabric/tablestomirroring.jpg" target="_blank" rel="noopener"><img src="../assets/images/fabric/tablestomirroring.jpg" alt="Fabric Table Configuration in Business Central listing G/L Account, G/L Entry, Customer, customer ledger entries, Vendor, vendor ledger entries, Item and item ledger entries" loading="lazy"></a>
+<figcaption>Select the Business Central tables to replicate and review their Fabric entity names.</figcaption>
+</figure>
+<p>When your selection is ready, choose <strong>Connect to Fabric</strong>. Until you do, the setup will not be marked as complete.</p>
+
+<h2>Step 8: Set the frequency and start synchronization</h2>
+<p>Specify how often, in minutes, data should be exported to Fabric. The right interval depends on your needs: if reports are only checked once a day, synchronizing every few minutes may be unnecessary; if you need near-real-time information, use a shorter interval.</p>
+<p>Then start synchronization. Remember that it is <strong>asynchronous</strong>: it does not execute immediately, but according to its schedule.</p>
+
+<h2>Step 9: Monitor synchronization</h2>
+<p>Business Central includes a <strong>Monitoring</strong> section where you can see:</p>
+<ul>
+<li>How each synchronization is running.</li>
+<li>Whether errors have occurred and their details.</li>
+<li>The different synchronization links in the side panel.</li>
+</ul>
+<p>This is where to look if data does not appear in Fabric when you expect it.</p>
+<figure>
+<a href="../assets/images/fabric/fabricSyncMonitoring.png" target="_blank" rel="noopener"><img src="../assets/images/fabric/fabricSyncMonitoring.png" alt="Business Central Fabric Synchronization Overview showing export runs with Succeeded states, start times and end times" loading="lazy"></a>
+<figcaption>Use Fabric Synchronization Overview to check each export's state and timing. Select Refresh page to see the latest results.</figcaption>
+</figure>
+
+<h2>Step 10: Check that the data arrives</h2>
+<p>To validate the result, I created a new test customer in Business Central before starting the process, using a sample address. After synchronization, Fabric shows a Business Central schema containing the tables we configured. When I open the customer table, the new record is there.</p>
+<p>It is a straightforward way to check the whole chain end to end: create a recognizable record in Business Central and then find it in Fabric.</p>
+
+<h2>Quick troubleshooting checklist</h2>
+<ul>
+<li>Is the environment running <strong>29.1 or later</strong>?</li>
+<li>Is the Fabric setting allowing <strong>service principals to access the APIs</strong> enabled?</li>
+<li>Is the <strong>principal ID</strong> the Object ID of the <em>enterprise application</em>, rather than the app registration?</li>
+<li>Is the redirect URI the Business Central return URL?</li>
+<li>Did you add the application to the workspace as a <strong>Contributor</strong> <em>before</em> connecting?</li>
+<li>Have you chosen <strong>Connect to Fabric</strong> and selected the tables and companies?</li>
+</ul>
+
+<h2>What comes next?</h2>
+<p>Once the data is replicated to Fabric, the natural next step is to build a <strong>semantic model</strong> so Power BI can work with the replicated Business Central data. That will be the topic of the next article.</p>
+<p>If you try this, I would love to hear how it goes, especially if you manage to use the app registration provided by Microsoft.</p>
+
+<h2 id="video">Watch the setup in action</h2>
+<p>Follow the full setup and see the synchronization in practice in the video below. You can also <a href="https://youtu.be/_EWUce4rUb8" target="_blank" rel="noopener">watch it directly on YouTube</a>.</p>
+<div class="video-embed">
+<iframe src="https://www.youtube-nocookie.com/embed/_EWUce4rUb8" title="Connecting Business Central to Microsoft Fabric: step-by-step demonstration" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+</div>
+
+<div class="callout">
+If you found this content useful, you can <a href="https://buymeacoffee.com/rcorella" target="_blank" rel="noopener">buy me a coffee</a> &mdash; it helps me keep writing and recording. Thank you!
+</div>
+</main>
+<div class="statusbar">
+<span>main</span>
+<span><a href="../index.html">&larr; back to index</a></span>
+</div>
+<script data-goatcounter="https://learningbusinesscentral.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
