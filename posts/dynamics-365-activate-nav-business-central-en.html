@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Dynamics 365 Activate targets Salesforce and SAP ECC migrations. What could it mean for NAV and Business Central, and why do on-premises customers stay?">
+<title>Dynamics 365 Activate is here. Where is the one for NAV?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" type="image/png" sizes="48x48" href="../assets/images/favicon.png">
+</head>
+<body>
+<div class="titlebar">
+<span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+<span class="path">learning-business-central — posts/dynamics-365-activate-nav-business-central-en.html</span>
+</div>
+<div class="tabbar">
+<div class="tab"><a href="../index.html"><span>index</span><span class="ext">.html</span></a></div>
+<div class="tab active"><span>dynamics-365-activate-nav-business-central-en</span><span class="ext">.html</span></div>
+</div>
+<main>
+<div class="eyebrow">posts / business central</div>
+<h1>Dynamics 365 Activate is here. Where is the one for NAV?</h1>
+<p class="meta"><span>Roberto Corella</span> <span><time datetime="2026-11-20">November 20, 2026</time></span> <span>Dynamics 365 Activate · NAV · Business Central · Migrations</span></p>
+
+<p>Microsoft now has an AI migration tool for Salesforce and SAP ECC customers, and nothing announced for those of us who live in Business Central. I think that gap will close, but a tool will not fix the reason NAV customers stay where they are.</p>
+
+<h2>What Microsoft presented at Ignite</h2>
+<p>Dynamics 365 Activate, formerly Project Mia, is an AI tool that <a href="https://pulse2.com/microsoft-launches-dynamics-365-activate-to-accelerate-ai-powered-crm-and-erp-migrations/">analyzes an existing environment, generates configurations and migrates data</a>. At Ignite 2026 it is <a href="https://msdynamicsworld.com/node/39770">generally available for CRM, with Salesforce as the first target, and in private preview for ERP, starting with SAP ECC</a>.</p>
+
+<ul>
+<li><strong>Sales and CRM.</strong> Activate arrives with Copilot plugins for Sales, Customer Service and ERP, and even a <a href="https://msdynamicsworld.com/node/39770">Salesforce in Copilot plugin</a>. The play: make leaving the competitor cheap, and make the CRM something nobody has to open.</li>
+<li><strong>SAP ECC.</strong> Partners can use Activate to analyze processes, customizations and dependencies and scope the project. The timing is deliberate: <a href="https://www.sap.com/sea/resources/sap-erp-modernization-guide-for-finance">SAP ends mainstream maintenance for ECC in 2027</a>.</li>
+<li><strong>F&amp;O.</strong> Specialized agents for requirements, configuration, data migration, testing and cutover, with <a href="https://msdynamicsworld.com/node/39372">no general availability date yet</a>.</li>
+</ul>
+
+<figure>
+<a href="../assets/images/migrations/migrationSalesForce.png">
+<img src="../assets/images/migrations/migrationSalesForce.png" alt="Dynamics 365 Activate preview showing Salesforce Discovery results for objects, flows, Apex code, business processes, ISV packages and integrations" loading="lazy">
+</a>
+<figcaption>Salesforce Discovery in Dynamics 365 Activate. This screenshot shows the preview interface.</figcaption>
+</figure>
+
+<p>An analyst quoted by CIO called it <a href="https://www.cio.com/article/4220712/microsoft-targets-salesforce-customers-with-ai-powered-dynamics-365-migration-tool.html">an accelerator, not an autopilot</a>. And in all the Activate coverage I read, there is not one mention of Business Central or NAV.</p>
+
+<h2>Why on-premises customers stay</h2>
+<p>Microsoft does not publish how many customers are still on-premises, so I will not give a number. The reasons below come mostly from partners who sell migrations, so read them as perspectives, not data.</p>
+
+<ul>
+<li><strong>It still works.</strong> One partner put it well: <a href="https://www.westerncomputer.com/resources/blog/5-reasons-to-migrate-from-nav-to-business-central-cloud">the pain of change has not yet outweighed the pain of staying put</a>.</li>
+<li><strong>Customizations.</strong> <a href="https://www.sikich.com/?p=12136">Business-critical customizations did not migrate automatically</a>, and the code drifts further from standard every year.</li>
+<li><strong>The version gap.</strong> Some are on a NAV <a href="https://archerpoint.com/?p=14091">so old they doubt they can ever catch up</a>, and there is no direct jump: NAV 2015 to 2018 <a href="https://msdynamicsworld.com/node/39387">go through Business Central 14 first</a>.</li>
+<li><strong>Windows client and ISV add-ons.</strong> Both need a replacement before the move, per the <a href="https://archerpoint.com/?p=14091">same ArcherPoint piece</a>.</li>
+<li><strong>Putting it off until something breaks.</strong> A Mibuso poster described the usual path for heavily customized systems as <a href="https://forum.mibuso.com/discussion/comment/294034">waiting until a tax update or a new Windows version forces the issue</a>.</li>
+</ul>
+
+<p>None of the reasons I found is about missing functionality in Business Central. They are about cost, debt and inertia.</p>
+
+<h2>My take: will Business Central get its own Activate?</h2>
+<p>My answer: yes, I expect an Activate-style tool for moving NAV and on-premises customers to the cloud, but it will speed projects up, not remove the reasons above. That is my reading of the signals, not an announcement.</p>
+
+<figure>
+<img src="../assets/images/migrations/migracionNAVBC.png" alt="Conceptual illustration of a legacy Dynamics NAV computer connected by a digital path to Business Central in the cloud" loading="lazy">
+<figcaption>From NAV to Business Central in the cloud: a conceptual illustration, not an announced Activate capability.</figcaption>
+</figure>
+
+<p><strong>Why I think it will come</strong></p>
+<ul>
+<li><strong>The pieces already exist.</strong> The F&amp;O version already has agents for requirements, configuration, data migration, testing and cutover, which is most of a NAV upgrade. Microsoft's partner programme already targets <a href="https://microsoftpartners.microsoft.com/abs/engagements/erp">customers moving from on-premises ERP to Business Central or the F&amp;O apps</a>.</li>
+<li><strong>Moving an on-premises customer is the cheapest growth Microsoft has.</strong> At Directions NA 2025, Bryan Goode told partners to <a href="https://msdynamicsworld.com/node/35910">move them to the cloud aggressively</a> and spoke of a huge base still on-premises.</li>
+<li><strong>NAV to Business Central is a shorter distance than Salesforce to Dynamics.</strong> The two products <a href="https://learn.microsoft.com/en-us/previous-versions/business-applications-release-notes/October18/dynamics365-business-central/business-central-everywhere">share the same code base lineage</a>. Known source, known target: the case Activate was designed for.</li>
+</ul>
+
+<p><strong>Why I am cautious</strong></p>
+<ul>
+<li><strong>The hard part is customizations, not data.</strong> Twenty years of C/AL code, each system unique. Microsoft's route depends on <a href="https://msdynamicsworld.com/node/39387">how heavily customized the system is and whether you migrate or reimplement</a>.</li>
+<li><strong>ERP Activate is still in private preview,</strong> with no date.</li>
+<li><strong>Partner economics.</strong> A tool that cuts effort helps the customer but shrinks the billable project, so partners must see it as a way to win more migrations.</li>
+<li><strong>Inertia is not a tooling problem.</strong> A tool lowers the cost of a project. It does not create the urgency to start one.</li>
+</ul>
+
+<p><strong>Business Central is not being forgotten</strong></p>
+<p>At Directions EMEA 2026, Microsoft showed <a href="https://tharangac.com/2026/11/directions-emea-2026-what-is-new-for-business-central-and-what-we-learned.html">Edit with Copilot (public preview targeted for April 2027), business skills, and the Expense Agent in every country where Business Central is sold</a>. The agent story for Business Central runs on its own track. I read its absence from Activate as timing, not neglect.</p>
+
+<p><strong>What I would want from a NAV-to-BC Activate</strong></p>
+<ol>
+<li><strong>Discovery.</strong> Read the objects, diff them against standard, and use usage data to show which customizations anyone still runs.</li>
+<li><strong>Disposition.</strong> For each customization: standard feature, AppSource app, extension, or retire.</li>
+<li><strong>Generation.</strong> Draft the AL extensions and their tests, with a human reviewing every one.</li>
+<li><strong>Data and cutover.</strong> Map data through the supported upgrade path, reconcile balances, and produce the cutover plan.</li>
+</ol>
+
+<p>That is the work good partners already do by hand. The opportunity is to make it repeatable and cheaper, so "the project is too big to start" stops being an answer.</p>
+
+<h2>Where this leaves us</h2>
+<p>The calendar will decide for your customer, not the tool, and the useful work starts before any tool exists.</p>
+<ul>
+<li><strong>NAV and on-premises customers:</strong> check your version's support status, inventory your customizations and add-ons now (that inventory drives the cost, and any future tool will ask for it first), and ask your partner about the <a href="https://tharangac.com/2026/11/directions-emea-2026-what-is-new-for-business-central-and-what-we-learned.html">migration incentives announced for FY27</a>.</li>
+<li><strong>Partners:</strong> build a repeatable NAV assessment now, with or without Microsoft's tool, and watch the Activate ERP preview for any Business Central scope.</li>
+</ul>
+
+<p>My bet: Microsoft extends Activate toward Business Central within the next year or so, and the first versions are best at assessment and planning and weakest at converting the code. I would be glad to be wrong about the second part.</p>
+
+<h2>Sources</h2>
+<ul>
+<li><a href="https://msdynamicsworld.com/node/39770">MSDW: Ignite 2026</a> · <a href="https://msdynamicsworld.com/node/39372">MSDW: Activate for ERP</a> · <a href="https://pulse2.com/microsoft-launches-dynamics-365-activate-to-accelerate-ai-powered-crm-and-erp-migrations/">Pulse 2</a> · <a href="https://www.cio.com/article/4220712/microsoft-targets-salesforce-customers-with-ai-powered-dynamics-365-migration-tool.html">CIO</a> · <a href="https://www.sap.com/sea/resources/sap-erp-modernization-guide-for-finance">SAP</a></li>
+<li><a href="https://msdynamicsworld.com/node/35910">MSDW: Directions NA 2025</a> · <a href="https://msdynamicsworld.com/node/39387">MSDW: NAV to BC in 2026</a> · <a href="https://microsoftpartners.microsoft.com/abs/engagements/erp">Microsoft partner ERP engagements</a> · <a href="https://learn.microsoft.com/en-us/previous-versions/business-applications-release-notes/October18/dynamics365-business-central/business-central-everywhere">Microsoft Learn, 2018 release notes</a> · <a href="https://tharangac.com/2026/11/directions-emea-2026-what-is-new-for-business-central-and-what-we-learned.html">TharangaC: Directions EMEA 2026</a></li>
+<li><a href="https://www.westerncomputer.com/resources/blog/5-reasons-to-migrate-from-nav-to-business-central-cloud">Western Computer</a> · <a href="https://www.sikich.com/?p=12136">Sikich</a> · <a href="https://archerpoint.com/?p=14091">ArcherPoint</a> · <a href="https://forum.mibuso.com/discussion/comment/294034">Mibuso</a></li>
+</ul>
+<p>Some of these I read as search results, not as full pages: check before quoting.</p>
+
+<div class="callout">
+If you found this content useful, you can <a href="https://buymeacoffee.com/rcorella" target="_blank" rel="noopener">buy me a coffee</a> — it helps me keep writing. Thank you!
+</div>
+</main>
+<div class="statusbar">
+<span>main</span>
+<span><a href="../index.html">← back to index</a></span>
+</div>
+<script data-goatcounter="https://learningbusinesscentral.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
